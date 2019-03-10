@@ -1,79 +1,11 @@
-var User = require('../models/user');
-var express = require('express');
-var router = express.Router();
+const usersCtrl = require('../controllers/users')
+const express = require('express')
+const router = express.Router()
 
-router.route('/users')
+router.get('/users', usersCtrl.getUsers)
+router.get('/users/:userId', usersCtrl.getUser)
+router.post('/users', usersCtrl.createUser)
+router.put('/users/:userId', usersCtrl.updateUser)
+router.delete('/users/:userId', usersCtrl.deleteUser)
 
-   .get(function(req, res) {
-      User.find(function(err, users){
-
-         if (err){
-            return res.send(err);
-         }
-
-         res.json(users);
-         
-      });
-   })
-
-   .post(function(req, res){
-      var user = new User(req.body);
-
-      user.save(function(err, users){
-
-         if (err) {
-            return res.send(err);
-         }
-
-         res.send( { message: 'User added'});
-
-      });
-   });
-
-router.route('/users/:id')
-   
-   .put(function(req, res){
-      User.findOne( { _id: req.params.id}, function(err, user) {
-         var user = new User(req.body);
-         if (err){
-            return res.send(err);
-         }
-         console.log(req.body);
-         for (prop in req.body){
-            user[prop] = req.body[prop];
-         }
-
-         user.save(function(err){
-            if (err){
-               return res.send(err);
-            }
-
-            res.send({ message: 'User updated'});
-         });
-      });
-   })
-
-   .get(function(req, res){
-      User.findOne( { id: req.params.id}, function(err, user){
-
-         if (err){
-            return res.send(err);
-         }
-
-         res.json(user);
-      });
-   })
-
-   .delete(function(req, res){
-      User.remove({
-         _id: req.params.id
-      }, function (err, user){
-         if (err){
-            return res.send(err);
-         }
-
-         res.json( { meessage: 'User deleted'});
-      });
-   });
-
-module.exports = router;
+module.exports = router
