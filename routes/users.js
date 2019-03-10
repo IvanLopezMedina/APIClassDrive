@@ -17,7 +17,9 @@ router.route('/users')
    })
 
    .post(function(req, res){
-      User.save(function(err, users){
+      var user = new User(req.body);
+
+      user.save(function(err, users){
 
          if (err) {
             return res.send(err);
@@ -32,11 +34,11 @@ router.route('/users/:id')
    
    .put(function(req, res){
       User.findOne( { _id: req.params.id}, function(err, user) {
-
+         var user = new User(req.body);
          if (err){
             return res.send(err);
          }
-
+         console.log(req.body);
          for (prop in req.body){
             user[prop] = req.body[prop];
          }
