@@ -3,37 +3,40 @@ const mongoose = require('mongoose')
 const service = require('../service')
 
 function signUp (req, res) {
-   const user = new User({
+   /*const user = new User({
       email: req.body.email,
       displayName: req.body.displayName,
       password: req.body.password
-   })
-
+   })*/
+   let user = new User()
+   user.email = req.body.email
+   user.displayName = req.body.displayName
+   user.avatar = req.body.avatar
+   user.password = req.body.password
    user.avatar = user.gravatar()
 
-   user.save((err) => {
+   user.save((err, userStored) => {
       if (err) res.status(500).send({ message: `Error creating the user ${err}`})
 
-      return res.status(200).send({ token: service.createToken(user) })
+      return res.status(200).send({ user: userStored, token: service.createToken(user) })
    })
 }
 
-function signIn (req, res) {
-   User.findOne({ email: req.body.email}, (err, user) => {
-      if (err) return res.status(500).send({message: `Error ${err}`})
-      if (!user) return res.status(404),send({message: 'User non existent'})
-
-      return user.comparePassword(req.body.password, (err, isMatch) => {
-         if (err) return res.status(500).send({ msg: `Error al ingresar: ${err}` })
-         if (!isMatch) return res.status(404).send({ msg: `Error de contraseña: ${req.body.email}` })
-
-         req.user = user
-         return res.status(200).send({ 
-            msg: 'Te has logueado correctamente', 
-            token: service.createToken(user) })
-      })
-   })
-}
+const signIn = (req, res) => {
+   User.findOne({ email: req.body.email }, (err, user) => {
+     if (err) return res.status(500).send({ msg: `Error al ingresar: ${err}` })
+     if (!user) return res.status(404).send({ msg: `no existe el usuario: ${req.body.email}` })
+ 
+     return user.comparePassword(req.body.password, (err, isMatch) => {
+       if (err) return res.status(500).send({ msg: `Error al ingresar: ${err}` })
+       if (!isMatch) return res.status(404).send({ msg: `Error de contraseña: ${req.body.email}` })
+ 
+       req.user = user
+       return res.status(200).send({ msg: 'Te has logueado correctamente', token: service.createToken(user) })
+     });
+ 
+   }).select('_id email +password');
+ }
 
 function getUsers (req, res) {
    User.find(function(err, users){
@@ -70,8 +73,9 @@ function updateUser(req, res) {
 function createUser (req, res) {
    let user = new User()
    user.email = req.body.email
+   user.displayName = req.body.displayName
+   user.avatar = req.body.avatar
    user.password = req.body.password
-   
    
    console.log(req.body.email)
    user.save((err, userStored) => {
