@@ -3,36 +3,29 @@ const mongoose = require('mongoose')
 const service = require('../service')
 
 function signUp (req, res) {
-   /*const user = new User({
-      email: req.body.email,
-      displayName: req.body.displayName,
-      password: req.body.password
-   })*/
-   let user = new User()
+   let user = new User
    user.email = req.body.email
    user.displayName = req.body.displayName
-   user.avatar = req.body.avatar
    user.password = req.body.password
-   user.avatar = user.gravatar()
-
-   user.save((err, userStored) => {
-      if (err) res.status(500).send({ message: `Error creating the user ${err}`})
-
-      return res.status(200).send({ user: userStored, token: service.createToken(user) })
+   user.avatar = user.gravatar();
+ 
+   user.save(err => {
+     if (err) return res.status(500).send({ msg: `Error al crear usuario: ${err}` })
+     return res.status(200).send({ user: user, token: service.createToken(user) })
    })
-}
+ }
 
-const signIn = (req, res) => {
+function signIn (req, res) {
    User.findOne({ email: req.body.email }, (err, user) => {
-     if (err) return res.status(500).send({ msg: `Error al ingresar: ${err}` })
-     if (!user) return res.status(404).send({ msg: `no existe el usuario: ${req.body.email}` })
+     if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
+     if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
  
      return user.comparePassword(req.body.password, (err, isMatch) => {
-       if (err) return res.status(500).send({ msg: `Error al ingresar: ${err}` })
-       if (!isMatch) return res.status(404).send({ msg: `Error de contraseña: ${req.body.email}` })
+       if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
+       if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.email}` })
  
        req.user = user
-       return res.status(200).send({ msg: 'Te has logueado correctamente', token: service.createToken(user) })
+       return res.status(200).send({ msg: 'Login succesfull', token: service.createToken(user) })
      });
  
    }).select('_id email +password');
@@ -88,10 +81,10 @@ function createUser (req, res) {
 function deleteUser (req, res) {
    let userId = req.params.userId
 
-   User.findOne( userId,  (err, user) => {
+   User.findById( userId,  (err, user) => {
       if (err) return res.status(500).send( { message: `Error deleting the user: ${err}`})
 
-      User.remove(err => {
+      User.deleteOne(user, err => {
          if (err) return res.status(500).send( { message: `Error deleting the user: ${err}`})
          res.status(200).send( { message: 'The user has been deleted successfully'})
       })
