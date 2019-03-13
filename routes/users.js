@@ -14,5 +14,6 @@ router.post('/signin', usersCtrl.signIn)
 router.get('/private', auth, function(req, res) {
    res.status(200).send({ message: 'Test: You have access'})
 })
+router.post('/crearGrup', usersCtrl.signUp)
 
 module.exports = router
