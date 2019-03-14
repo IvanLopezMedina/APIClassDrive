@@ -10,6 +10,9 @@ const UserSchema = new Schema({
     avatar: String,
     signupDate: { type: Date, default: Date.now() },
     lastLogin: Date
+},
+{
+    versionKey: false
 })
 
 UserSchema.pre('save', function (next) {
