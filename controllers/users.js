@@ -35,7 +35,8 @@ const getUsers = (req, res) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!users) return res.status(404).send({ message: `The user doesn't exist: ${err}` })
 
-        res.json(users)
+        //res.json(users)
+        res.status(200).send(users)
     })
 }
 
