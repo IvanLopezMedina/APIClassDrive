@@ -4,12 +4,15 @@ const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
 
 const UserSchema = new Schema({
-    email: { type: String, unique: true, lowercase: true },
-    displayName: String,
-    password: { type: String, select: false },
-    avatar: String,
-    signupDate: { type: Date, default: Date.now() },
-    lastLogin: Date
+    _id: { type: String, lowercase: true },
+    Name: { type: String, lowercase: true },
+    Surname: { type: String, lowercase: true },
+    Email: { type: String, lowercase: true },
+    Password: { type: String, select: true },
+    Country: { type: String, select: true },
+    Avatar: String,
+    SignupDate: { type: Date, default: Date.now },
+    LastLogin: Date
 },
 {
     versionKey: false
@@ -17,15 +20,15 @@ const UserSchema = new Schema({
 
 UserSchema.pre('save', function (next) {
     let user = this
-    if (!user.isModified('password')) return next()
+    if (!user.isModified('Password')) return next()
 
     bcrypt.genSalt(10, (err, salt) => {
         if (err) return next(err)
 
-        bcrypt.hash(user.password, salt, null, (err, hash) => {
+        bcrypt.hash(user.Password, salt, null, (err, hash) => {
             if (err) return next(err)
 
-            user.password = hash
+            user.Password = hash
             next()
         })
     })
@@ -33,15 +36,15 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.methods.gravatar = function (size) {
     if (!size) {
-        size = 200;
+        size = 200
     }
-    if (!this.email) return `https:/gravatar.com/avatar/?s${size}&d=retro`
-    const md5 = crypto.createHash('md5').update(this.email).digest('hex')
+    if (!this.Email) return `https:/gravatar.com/avatar/?s${size}&d=retro`
+    const md5 = crypto.createHash('md5').update(this.Email).digest('hex')
     return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`
 }
 
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+    bcrypt.compare(candidatePassword, this.Password, (err, isMatch) => {
         cb(err, isMatch)
     })
 }
