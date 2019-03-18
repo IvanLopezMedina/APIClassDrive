@@ -3,8 +3,10 @@ const service = require('../service')
 
 const signUp = (req, res) => {
     let user = new User()
+    user.name = req.body.name
+    user.lastname = req.body.lastname
     user.email = req.body.email
-    user.displayName = req.body.displayName
+    user.displayname = req.body.displayname
     user.password = req.body.password
     user.country = req.body.country
     user.avatar = user.gravatar()
@@ -16,7 +18,7 @@ const signUp = (req, res) => {
 }
 
 const signIn = (req, res) => {
-    User.findOne({ _id: req.body.email }, (err, user) => {
+    User.findOne({ email: req.body.email }, (err, user) => {
         if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
         if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
 
@@ -27,7 +29,7 @@ const signIn = (req, res) => {
             req.user = user
             return res.status(200).send({ msg: 'Login succesfull', token: service.createToken(user) })
         })
-    }).select('_id Email +Password')
+    }).select('_id email +password')
 }
 
 const getUsers = (req, res) => {
