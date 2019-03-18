@@ -4,9 +4,11 @@ const creatGroup = (req, res) => {
     console.log(req.body)
     let group = new Group()
     group.name = req.body.name
-    group.picture = req.body.picture
-    group.description = req.body.description
-    group.category = req.body.category
+    group.center = req.body.center
+    group.degree = req.body.degree
+    group.tags = req.body.tags
+    group.type = req.body.type
+    group.picture = group.gravatar()
     group.password = req.body.password
     group.save((err) => {
         if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
