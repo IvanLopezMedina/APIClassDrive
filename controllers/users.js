@@ -1,5 +1,5 @@
 const User = require('../models/user')
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
 const service = require('../service')
 
 const signUp = (req, res) => {
