@@ -3,13 +3,11 @@ const service = require('../service')
 
 const signUp = (req, res) => {
     let user = new User()
-    user._id = req.body.Username
-    user.Name = req.body.Name
-    user.Surname = req.body.Surname
-    user.Email = req.body.Email
-    user.Password = req.body.Password
-    user.Country = req.body.Country
-    user.Avatar = user.gravatar()
+    user.email = req.body.email
+    user.displayName = req.body.displayName
+    user.password = req.body.password
+    user.country = req.body.country
+    user.avatar = user.gravatar()
 
     user.save(err => {
         if (err) return res.status(500).send({ msg: `Error al crear usuario: ${err}` })
@@ -18,13 +16,13 @@ const signUp = (req, res) => {
 }
 
 const signIn = (req, res) => {
-    User.findOne({ _id: req.body.Username }, (err, user) => {
+    User.findOne({ _id: req.body.email }, (err, user) => {
         if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
-        if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.Username}` })
+        if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
 
-        return user.comparePassword(req.body.Password, (err, isMatch) => {
+        return user.comparePassword(req.body.password, (err, isMatch) => {
             if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
-            if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.Username}` })
+            if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.email}` })
 
             req.user = user
             return res.status(200).send({ msg: 'Login succesfull', token: service.createToken(user) })

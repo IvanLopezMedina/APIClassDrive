@@ -1,11 +1,7 @@
 const mongoose = require('mongoose')
 const app = require('./app')
 const config = require('./config')
-const cors = require('cors')
 
-
-
-app.use(cors())
 app.set('port', process.env.PORT || config.port)
 
 mongoose.connect(config.db, (err, res) => {

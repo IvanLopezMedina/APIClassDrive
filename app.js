@@ -5,19 +5,18 @@ const users = require('./routes/users')
 const country = require('./routes/countries')
 const cors = require('cors')
 
-
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/api', users)
 app.use('/country', country)
 
 app.use(cors())
-app.use(function (req, res, next) {
-    // Website you wish to allow to connect
-    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 
-    res.setHeader('Access-Control-Allow-Origin', '*')
+app.all('/api/*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Headers', 'Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With')
+    res.header('Access-Control-Allow-Methods", "GET, PUT, POST')
+    return next()
 })
-
 
 module.exports = app
