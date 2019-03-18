@@ -8,7 +8,7 @@ const cors = require('cors')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/api', users)
-app.use('/country', country)
+app.use('/api', country)
 
 app.use(cors())
 
