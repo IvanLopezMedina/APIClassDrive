@@ -1,18 +1,18 @@
 const Group = require('../models/group')
+// const { check, validationResult } = require('express-validator');
 
 const creatGroup = (req, res) => {
-    console.log(req.body)
     let group = new Group()
     group.name = req.body.name
     group.center = req.body.center
     group.degree = req.body.degree
     group.tags = req.body.tags
     group.type = req.body.type
-    group.picture = group.gravatar()
     group.password = req.body.password
-    group.save((err) => {
+    // group.picture = group.gravatar()
+    group.save((err) => { //  if (name.length > 1) throw new Error('camp obligatori')
         if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
-        return res.status(200).send({ group })
+        return res.status(200).send({ group: group })
     })
 }
 const getGrups = (req, res) => {

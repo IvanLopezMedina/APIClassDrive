@@ -5,7 +5,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const GroupSchema = Schema({
     name: String,
     center: String,
-    degreee: String,
+    degree: String,
     tags: [String],
     type: { type: String, enum: ['public', 'private'] },
     picture: String,
