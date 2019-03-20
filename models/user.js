@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     displayName: String,
     password: { type: String, select: false },
     country: { type: String, select: true },
+    center: [String],
     avatar: String,
     signupDate: { type: Date, default: Date.now() },
     lastLogin: Date

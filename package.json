@@ -1,7 +1,7 @@
 {
   "name": "testnode",
   "version": "1.0.0",
-  "description": "",
+  "description": "APIClassDrive",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -18,12 +18,20 @@
     "mongoose": "^5.4.18"
   },
   "devDependencies": {
-    "eslint": "^5.15.1",
+    "eslint": "^5.15.3",
     "eslint-config-google": "^0.12.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanLopezMedina/APIClassDrive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IvanLopezMedina/APIClassDrive/issues"
+  },
+  "homepage": "https://github.com/IvanLopezMedina/APIClassDrive#readme"
 }
