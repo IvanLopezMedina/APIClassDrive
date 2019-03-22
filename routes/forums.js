@@ -4,11 +4,12 @@ const router = express.Router()
 const auth = require('../middlewares/auth')
 
 router.get('/forums', forumsCtrl.getForums)
+
 router.get('/forums/:forumId', forumsCtrl.getForum)
 router.put('/forums/:forumId', forumsCtrl.updateForum)
 router.delete('/forums/:forumId', forumsCtrl.deleteForum)
 
-router.post('/createforum', forumsCtrl.createForum)
+router.post('/forum', forumsCtrl.createForum)
 // router.post('/signin', forumsCtrl.signIn)
 // Adding auth to the method, we ensure that the forum has a valid token
 // The token is send in the request body, with the tag: Authorization
