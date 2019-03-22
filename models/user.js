@@ -2,14 +2,15 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
+const validator = require('validator')
 
 const UserSchema = new Schema({
-    name: String,
-    lastname: String,
-    email: { type: String, unique: true, lowercase: true },
-    displayName: String,
-    password: { type: String, select: false },
-    country: { type: String, select: true },
+    name: { type: String, required: true },
+    lastname: { type: String, required: true },
+    email: { type: String, unique: true, lowercase: true, required: true, match: /\S+@\S+\.\S+/ },
+    displayname: { type: String, required: true },
+    password: { type: String, select: false, minlength: 8, required: true },
+    country: { type: String, select: true, required: true },
     avatar: String,
     signupDate: { type: Date, default: Date.now() },
     lastLogin: Date

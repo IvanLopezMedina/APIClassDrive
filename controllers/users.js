@@ -12,7 +12,7 @@ const signUp = (req, res) => {
     user.avatar = user.gravatar()
 
     user.save(err => {
-        if (err) return res.status(500).send({ msg: `Error al crear usuario: ${err}` })
+        if (err) return res.status(500).send({ msg: `Erorr creating the user: ${err}` })
         return res.status(200).send({ user: user, token: service.createToken(user) })
     })
 }
