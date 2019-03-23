@@ -1,16 +1,18 @@
 const User = require('../models/user')
-// const mongoose = require('mongoose')
 const service = require('../service')
 
 const signUp = (req, res) => {
     let user = new User()
+    user.name = req.body.name
+    user.lastname = req.body.lastname
     user.email = req.body.email
-    user.displayName = req.body.displayName
+    user.displayname = req.body.displayname
     user.password = req.body.password
+    user.country = req.body.country
     user.avatar = user.gravatar()
 
     user.save(err => {
-        if (err) return res.status(500).send({ msg: `Error al crear usuario: ${err}` })
+        if (err) return res.status(500).send({ msg: `Erorr creating the user: ${err}` })
         return res.status(200).send({ user: user, token: service.createToken(user) })
     })
 }
@@ -35,7 +37,7 @@ const getUsers = (req, res) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!users) return res.status(404).send({ message: `The user doesn't exist: ${err}` })
 
-        res.json(users)
+        res.status(200).send(users)
     })
 }
 
