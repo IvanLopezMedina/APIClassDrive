@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ObjectId = mongoose.Schema.Types.ObjectId
+const validator = require('validator')
 
 const GroupSchema = Schema({
     name: { type: String, required: true, unique: true },
@@ -25,13 +26,14 @@ GroupSchema.methods.gravatar = function (size) {
     return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`
 }
 
-GroupSchema.methods.privatePassword = function () {
-    let validation = false;
+GroupSchema.methods.validatePassword = function () {
+    let validation = false
     if ('private'.match(this.visibility)) {
-        if (this.password == null) return false
+        if (validator.isLength(this.password, 8)) validation = true
     } else {
-        return true
+        validation = true
     }
-    
+    return validation
 }
+
 module.exports = mongoose.model('Group', GroupSchema)

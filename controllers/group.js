@@ -1,7 +1,7 @@
 const Group = require('../models/group')
 // const { check, validationResult } = require('express-validator');
 
-const creatGroup = (req, res) => {
+const createGroup = (req, res) => {
     let group = new Group()
     group.name = req.body.name
     group.center = req.body.center
@@ -10,14 +10,15 @@ const creatGroup = (req, res) => {
     group.password = req.body.password
     group.avatar = group.gravatar()
     group.save((err) => {
-        if ( (req.body.visibility == 'private') && (!group.privatePassword)) {
-
+        if (group.validatePassword()) {
+            if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
+            return res.status(200).send({ group: group })
+        } else {
+            return res.status(403).send({ msg: 'The password for the private group is empty or invalid' })
         }
-        if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
-        return res.status(200).send({ group: group })
     })
 }
-const getGrups = (req, res) => {
+const getGroups = (req, res) => {
     Group.find(function (err, groups) {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!groups) return res.status(404).send({ message: `The group doesn't exist: ${err}` })
@@ -35,16 +36,7 @@ const getGroup = (req, res) => {
         res.status(200).send(group)
     })
 }
-const updateGroup = (req, res) => {
-    let groupId = req.params.groupId
-    let update = req.body
 
-    Group.findByIdAndUpdate(groupId, update, (err, groupUpdated) => {
-        if (err) return res.status(500).send({ message: `Error updating product: ${err}` })
-
-        res.status(200).send({ user: groupUpdated })
-    })
-}
 const deleteGroup = (req, res) => {
     let groupId = req.params.groupId
 
@@ -58,9 +50,8 @@ const deleteGroup = (req, res) => {
     })
 }
 module.exports = {
-    creatGroup,
-    getGrups,
+    createGroup,
+    getGroups,
     getGroup,
-    updateGroup,
     deleteGroup
 }
