@@ -5,12 +5,14 @@ const creatGroup = (req, res) => {
     let group = new Group()
     group.name = req.body.name
     group.center = req.body.center
-    group.degree = req.body.degree
     group.tags = req.body.tags
-    group.type = req.body.type
+    group.visibility = req.body.visibility
     group.password = req.body.password
-    // group.picture = group.gravatar()
-    group.save((err) => { //  if (name.length > 1) throw new Error('camp obligatori')
+    group.avatar = group.gravatar()
+    group.save((err) => {
+        if ( (req.body.visibility == 'private') && (!group.privatePassword)) {
+
+        }
         if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
         return res.status(200).send({ group: group })
     })
