@@ -21,15 +21,14 @@ const signIn = (req, res) => {
     User.findOne({ email: req.body.email }, (err, user) => {
         if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
         if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
-
+        console.log(user)
         return user.comparePassword(req.body.password, (err, isMatch) => {
             if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
             if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.email}` })
-
             req.user = user
-            return res.status(200).send({ msg: 'Login succesfull', token: service.createToken(user) })
+            return res.status(200).send({ msg: 'Login succesfull', user, token: service.createToken(user) })
         })
-    }).select('_id email +password')
+    }).select('name password lastname email displayname country avatar')
 }
 
 const getUsers = (req, res) => {
