@@ -5,15 +5,32 @@ const crypto = require('crypto')
 const bcrypt = require('bcrypt-nodejs')
 
 const GroupSchema = Schema({
-    name: { type: String, required: true, unique: true },
-    center: { type: String },
-    tags: [String],
-    visibility: { type: String, enum: ['public', 'private'], required: true },
-    password: { type: String, select: false },
+    name: { 
+        type: String, 
+        required: true, 
+        unique: true },
+    center: String ,
+    tags: {
+        degree: String,
+        subject: String
+    },
+    visibility: { 
+        type: String, 
+        enum: ['public', 'private'], 
+        required: true 
+    },
+    password: { 
+        type: String, 
+        select: false, 
+        minlength: 8 
+    },
     admin: { ObjectId },
     users: [ObjectId],
     avatar: String,
-    creationDate: { type: Date, default: Date.now() }
+    creationDate: { 
+        type: Date, 
+        default: Date.now() 
+    }
 },
 {
     versionKey: false
@@ -21,22 +38,17 @@ const GroupSchema = Schema({
 
 GroupSchema.pre('save', function (next) {
     let group = this
-    if ('private'.match(group.visibility)) {
-        if (this.validatePassword()) {
-            if (!group.isModified('password')) return next()
-            bcrypt.genSalt(10, (err, salt) => {
-                if (err) return next(err)
+    if (!group.isModified('password')) return next()
+    bcrypt.genSalt(10, (err, salt) => {
+        if (err) return next(err)
 
-                bcrypt.hash(group.password, salt, null, (err, hash) => {
-                    if (err) return next(err)
-                    group.password = hash
-                    next()
-                })
-            })
-        } else return next({ msg: 'Password invalid' })
-    } else {
-        return next()
-    }
+        bcrypt.hash(group.password, salt, null, (err, hash) => {
+            if (err) return next(err)
+            group.password = hash
+            next()
+        })
+    })
+    return next()
 })
 
 GroupSchema.methods.gravatar = function (size) {
@@ -55,12 +67,7 @@ GroupSchema.methods.comparePassword = function (candidatePassword, cb) {
 
 GroupSchema.methods.validatePassword = function () {
     let validation = false
-    if ('private'.match(this.visibility)) {
-        if (this.password !== null && this.password !== undefined) validation = true
-    } else {
-        if (this.password === null || this.password === undefined) validation = true
-    }
-
+    if (this.password !== null && this.password !== undefined) validation = true
     return validation
 }
 

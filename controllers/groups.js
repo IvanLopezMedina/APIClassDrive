@@ -7,18 +7,17 @@ const createGroup = (req, res) => {
     group.center = req.body.center
     group.tags = req.body.tags
     group.visibility = req.body.visibility
-    group.password = req.body.password
+    if ('private'.match(req.body.visibility)) group.password = req.body.password
     group.avatar = group.gravatar()
 
-    group.save((err) => {
-        if (group.validatePassword()) {
-            if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
+    if (group.validatePassword() || 'public'.match(req.body.visibility)) {
+        group.save((err) => {
+            if (err) return res.status(500).send({ msg: `Error creating the group: ${err}` })
             return res.status(200).send({ group: group })
-        } else {
-            return res.status(403).send({ msg: 'Password invalid' })
-        }
-    })
+        })
+    } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
 }
+
 const getGroups = (req, res) => {
     Group.find(function (err, groups) {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
