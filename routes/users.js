@@ -9,7 +9,7 @@ router.put('/users/:userId', usersCtrl.updateUser)
 router.delete('/users/:userId', usersCtrl.deleteUser)
 
 router.post('/signup', usersCtrl.signUp)
-router.post('/signin', auth, usersCtrl.signIn)
+router.post('/signin', usersCtrl.signIn)
 
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
