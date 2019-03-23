@@ -9,12 +9,13 @@ const createGroup = (req, res) => {
     group.visibility = req.body.visibility
     group.password = req.body.password
     group.avatar = group.gravatar()
+
     group.save((err) => {
         if (group.validatePassword()) {
             if (err) return res.status(500).send({ msg: `Error al crear grupo: ${err}` })
             return res.status(200).send({ group: group })
         } else {
-            return res.status(403).send({ msg: 'The password for the private group is empty or invalid' })
+            return res.status(403).send({ msg: 'Password invalid' })
         }
     })
 }
@@ -51,7 +52,8 @@ const deleteGroup = (req, res) => {
 }
 module.exports = {
     createGroup,
-    getGroups,
+    deleteGroup,
     getGroup,
-    deleteGroup
+    getGroups
+    
 }
