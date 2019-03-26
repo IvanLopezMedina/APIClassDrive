@@ -13,19 +13,16 @@ function createToken (user) {
 }
 
 const decodeToken = (token) => {
-    const decoded = new Promise((resolve, reject) => {
         try {
             const payload = jwt.decode(token, config.SECRET_TOKEN)
             if (payload.exp <= moment.unix()) {
-                Promise.reject(new Error('Error'), { status: 401, message: 'Token expired' })
+                throw new Error('Error'), { status: 401, message: 'Token expired' }
             }
-            resolve(payload.sub)
+            return (payload.sub)
         } catch (err) {
-            Promise.reject(new Error('Error'), { status: 500, message: 'Token expired' })
+            throw new Error('Error'), { status: 500, message: 'Unhandled Token Error' }
         }
-    })
 
-    return decoded
 }
 
 module.exports = {
