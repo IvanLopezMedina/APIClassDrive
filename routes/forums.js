@@ -4,7 +4,7 @@ const router = express.Router()
 const auth = require('../middlewares/auth')
 
 router.get('/posts/:forumId', forumsCtrl.getPosts)
-
+router.put('/addPost/:forumId', forumsCtrl.addPost)
 /*
 router.get('/forums', forumsCtrl.getForums)
 router.put('/forums/:forumId', forumsCtrl.updateForum)
