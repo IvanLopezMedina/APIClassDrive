@@ -1,5 +1,5 @@
 const Forum = require('../models/forum')
-
+/*
 const createForum = (req, res) => {
     let forum = new Forum()
     forum.groupName = req.body.groupname
@@ -28,8 +28,18 @@ const getForums = (req, res) => {
         res.status(200).send(forums)
     })
 }
+*/
 
+const getPosts = (req, res) => {
+    let forumId = req.params.forumId
+    Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
+        var posts = forum[ 'posts' ]
+        res.status(200).send({ posts })
+    })
+}
 module.exports = {
-    createForum,
-    getForums
+    getPosts
+    // getForums
 }
