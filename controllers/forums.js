@@ -41,26 +41,29 @@ const getPosts = (req, res) => {
 }
 
 const addPost = (req, res) => {
-    let forumId = req.params.forumId
-    Forum.findById(forumId, (err, forum) => {
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
-        if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
-        else {
-            forum.posts = forum['posts'].concat(req.body.posts)
-            forum.title = req.body.title
-            forum.date = req.body.date
-            forum.author = req.body.author
-            forum.likes = req.body.likes
-            forum.dislikes = req.body.dislikes
-            forum.userFavs = req.body.userfavs
-            forum.comments = req.body.comments
-            forum.comment = req.body.comment
-            forum.save((err) => {
-                if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
-                return res.status(200).send({ forum: forum })
-            })
-        }
-    })
+    if (req.body.posts == null) return res.status(500).send({ message: `Error post empty` })
+    else {
+        let forumId = req.params.forumId
+        Forum.findById(forumId, (err, forum) => {
+            if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+            if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
+            else {
+                forum.posts = forum['posts'].concat(req.body.posts)
+                forum.title = req.body.title
+                forum.date = req.body.date
+                forum.author = req.body.author
+                forum.likes = req.body.likes
+                forum.dislikes = req.body.dislikes
+                forum.userFavs = req.body.userfavs
+                forum.comments = req.body.comments
+                forum.comment = req.body.comment
+                forum.save((err) => {
+                    if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                    return res.status(200).send({ forum: forum })
+                })
+            }
+        })
+    }
 }
 module.exports = {
     getPosts,

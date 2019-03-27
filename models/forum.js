@@ -25,5 +25,11 @@ const ForumSchema = new Schema({
     posts: [postSchema]
 })
 
+postSchema.methods.postEmpty = function (posts) {
+    let empty = false
+    if (posts == null) empty = true
+    return empty
+}
+
 const Forum = mongoose.model('forum', ForumSchema)
 module.exports = Forum
