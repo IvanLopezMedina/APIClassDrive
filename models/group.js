@@ -7,29 +7,29 @@ const bcrypt = require('bcrypt-nodejs')
 const GroupSchema = Schema({
     name: { 
         type: String, 
-        required: true, 
+        required: true,
         unique: true },
-    center: String ,
+    center: String,
     tags: {
         degree: String,
         subject: String
     },
-    visibility: { 
-        type: String, 
-        enum: ['public', 'private'], 
-        required: true 
+    visibility: {
+        type: String,
+        enum: ['public', 'private'],
+        required: true
     },
-    password: { 
-        type: String, 
-        select: false, 
-        minlength: 8 
+    password: {
+        type: String,
+        select: false,
+        minlength: 8
     },
     admin: { ObjectId },
     users: [ObjectId],
     avatar: String,
-    creationDate: { 
-        type: Date, 
-        default: Date.now() 
+    creationDate: {
+        type: Date,
+        default: Date.now()
     }
 },
 {
