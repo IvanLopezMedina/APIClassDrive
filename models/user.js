@@ -29,11 +29,7 @@ const UserSchema = new Schema({
         minlength: 8,
         required: true
     },
-    country: {
-        type: String,
-        select: true,
-        required: true
-    },
+    groups: [],
     avatar: String,
     signupDate: {
         type: Date,

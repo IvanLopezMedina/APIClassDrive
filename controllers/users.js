@@ -8,11 +8,10 @@ const signUp = (req, res) => {
     user.email = req.body.email
     user.displayname = req.body.displayname
     user.password = req.body.password
-    user.country = req.body.country
     user.avatar = user.gravatar()
 
     user.save(err => {
-        if (err) return res.status(500).send({ msg: `Erorr creating the user: ${err}` })
+        if (err) return res.status(500).send({ msg: `Error creating the user: ${err}` })
         return res.status(200).send({ user: user, token: service.createToken(user) })
     })
 }
@@ -21,14 +20,13 @@ const signIn = (req, res) => {
     User.findOne({ email: req.body.email }, (err, user) => {
         if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
         if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
-        console.log(user)
         return user.comparePassword(req.body.password, (err, isMatch) => {
             if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
             if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.email}` })
             req.user = user
             return res.status(200).send({ msg: 'Login succesfull', user, token: service.createToken(user) })
         })
-    }).select('name password lastname email displayname country avatar')
+    }).select('name password lastname email displayname groups avatar')
 }
 
 const getUsers = (req, res) => {

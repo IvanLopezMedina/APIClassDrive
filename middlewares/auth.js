@@ -9,7 +9,6 @@ const isAuth = async (req, res, next) => {
     try {
         const response = await services.decodeToken(token)
         req.user = response
-        console.log(req.user)
         if (req.user === req.body.id) {
             next()
         } else {
