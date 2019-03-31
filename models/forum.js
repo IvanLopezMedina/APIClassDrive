@@ -2,10 +2,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ObjectId = mongoose.Schema.Types.ObjectId
 
-const commentSchema = new Schema({
+const answerSchema = new Schema({
     author: String,
     date: { type: Date, default: Date.now() },
-    comment: String,
+    answer: String,
     likes: Number,
     dislikes: Number
 })
@@ -17,7 +17,7 @@ const postSchema = new Schema({
     likes: Number,
     dislikes: Number,
     userFavs: [ObjectId],
-    comments: [commentSchema]
+    answers: [answerSchema]
 })
 
 const ForumSchema = new Schema({
@@ -32,4 +32,10 @@ postSchema.methods.postEmpty = function (posts) {
 }
 
 const Forum = mongoose.model('forum', ForumSchema)
-module.exports = Forum
+const Answer = mongoose.model('answer', answerSchema)
+const Post = mongoose.model('post', postSchema)
+module.exports = {
+    Forum,
+    Answer,
+    Post
+}
