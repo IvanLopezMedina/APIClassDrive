@@ -26,7 +26,7 @@ const signIn = (req, res) => {
             req.user = user
             return res.status(200).send({ msg: 'Login succesfull', user, token: service.createToken(user) })
         })
-    }).select('name password lastname email displayname groups avatar')
+    }).select('Name password lastname email displayname groups avatar')
 }
 
 const getUsers = (req, res) => {
