@@ -18,10 +18,10 @@ const signUp = (req, res) => {
 
 const signIn = (req, res) => {
     User.findOne({ email: req.body.email }, (err, user) => {
-        if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
+        if (err) return res.status(409).send({ msg: `SignIn error: ${err}` })
         if (!user) return res.status(404).send({ msg: `The user doesn't exist: ${req.body.email}` })
         return user.comparePassword(req.body.password, (err, isMatch) => {
-            if (err) return res.status(500).send({ msg: `SignIn error: ${err}` })
+            if (err) return res.status(409).send({ msg: `SignIn error: ${err}` })
             if (!isMatch) return res.status(404).send({ msg: `Password incorrect: ${req.body.email}` })
             req.user = user
             return res.status(200).send({ msg: 'Login succesfull', user, token: service.createToken(user) })
@@ -31,7 +31,7 @@ const signIn = (req, res) => {
 
 const getUsers = (req, res) => {
     User.find(function (err, users) {
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!users) return res.status(404).send({ message: `The user doesn't exist: ${err}` })
 
         res.status(200).send(users)
@@ -42,7 +42,7 @@ const getUser = (req, res) => {
     let userId = req.params.userId
 
     User.findById(userId, (err, user) => {
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!user) return res.status(404).send({ message: `The user doesn't exist: ${err}` })
 
         res.status(200).send(user)
