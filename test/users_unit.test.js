@@ -1,10 +1,7 @@
 /* eslint-disable no-undef */
 const app = require('../app')
-const chai = require('chai')
 const request = require('supertest')
 const assert = require('assert')
-const expect = chai.expect
-
 const mongoose = require('mongoose')
 const config = require('../config')
 
@@ -21,11 +18,11 @@ mongoose.connect(config.db, (err, res) => {
     })
 })
 
-describe('## Create User ', function () { 
-    it('should create a user', function (done) { 
-        request(app).post('/api/signup').send(user).end(function (err, res) { 
-            if (err) assert.strictEqual(res.statusCode,500)
-            assert.strictEqual(res.statusCode,200)
+describe('## Create User ', function () {
+    it('should create a user', function (done) {
+        request(app).post('/api/signup').send(user).end(function (err, res) {
+            if (err) assert.strictEqual(res.statusCode, 500)
+            assert.strictEqual(res.statusCode, 200)
             user = res.body
             done()
         })
