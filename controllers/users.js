@@ -11,7 +11,12 @@ const signUp = (req, res) => {
     user.avatar = user.gravatar()
 
     user.save(err => {
-        if (err) return res.status(409).send({ msg: `Error creating the user: ${err}` })
+        try{
+            var error = err.toString().split(':')[3].split('_')[0]
+        } catch { 
+            var error = ''
+        }
+        if (err) return res.status(409).send({ msg: `Current ${error} already exists` })
         return res.status(200).send({ user: user, token: service.createToken(user) })
     })
 }
