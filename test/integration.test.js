@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 const app = require('../app')
-const chai = require('chai')
 const request = require('supertest')
-const expect = chai.expect
-
 const mongoose = require('mongoose')
 const config = require('../config')
+const assert = require('assert')
 
 app.set('port', process.env.PORT || config.port)
 
@@ -21,24 +19,23 @@ mongoose.connect(config.db, (err, res) => {
 })
 
 describe('API Tests', function () { 
-    var user = { name: 'Ivan', lastname: 'Lopez', email: 'ivan.lopez.medina.ilm@gmail.com', password: 'classdrive', displayname: 'WTF', country: 'Spain' }
-    describe('# Get all tasks', function () {
+    describe('# Get all users', function () {
         it('should get all the users', function (done) {
             request(app).get('/api/users').end(function (err, res) {
-                if (err) expect(res.statusCode).to.equal(500)
-                expect(res.statusCode).to.equal(200)
-                expect(res.body).to.be.an('array')
+                if (err) assert.strictEqual(500, res.statusCode)
+                assert.strictEqual(200, res.statusCode)
+                
                 done()
             })
         })
     })
-
+    var user = { name: 'Ivan', lastname: 'Lopez', email: 'ivancidtofdff@gmail.com', password: 'classdrive', displayname: 'WedffdfffF', country: 'Spain' }
     describe('## Create User ', function () { 
         it('should create a user', function (done) { 
             request(app).post('/api/signup').send(user).end(function (err, res) { 
-                if (err) expect(res.statusCode).to.equal(500)
-                expect(res.statusCode).to.equal(200)
-                user = res.body
+                if (err) assert.strictEqual(500, res.statusCode)
+                assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(res.body.user.name, 'Ivan')
                 done()
             })
         })
