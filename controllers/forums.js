@@ -51,7 +51,7 @@ const addPost = (req, res) => {
         return res.status(500).send({ message: valid[0] })
     }
 }
-
+/*
 const addAnswer = (req, res) => {
     /* REQUIRED FIELDS ON REQUEST BODY
      *  postId: Post in which the answer is inserted
@@ -61,7 +61,7 @@ const addAnswer = (req, res) => {
      *  likes: likes the answer has
      *  dislikes: dislikes the answer has
      * */
-
+/*
     let forumId = req.params.forumId
     let postId = req.body.postId
 
@@ -88,6 +88,7 @@ const addAnswer = (req, res) => {
         }
     })
 }
+*/
 
 const validPost = function (req, res) {
     let posts = req.body.posts
@@ -103,6 +104,6 @@ const validPost = function (req, res) {
 }
 module.exports = {
     getPosts,
-    addPost,
-    addAnswer
+    addPost
+    // addAnswer
 }
