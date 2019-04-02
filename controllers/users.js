@@ -16,8 +16,8 @@ const signUp = (req, res) => {
         } catch { 
             var error = ''
         }
-        if (err) return res.status(409).send({ msg: `Current ${error} already exists` })
-        return res.status(200).send({ user: user, token: service.createToken(user) })
+        if (err) return res.status(409).send({ msg: `${error} ya existe. Utilice otro ${error}` })
+        return res.status(200).send({ msg: `SignUp successful` })
     })
 }
 
@@ -59,7 +59,7 @@ const updateUser = (req, res) => {
     let update = req.body
 
     User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
-        if (err) return res.status(500).send({ message: `Error updating product: ${err}` })
+        if (err) return res.status(409).send({ message: `Error updating product: ${err}` })
 
         res.status(200).send({ user: userUpdated })
     })
@@ -69,10 +69,10 @@ const deleteUser = (req, res) => {
     let userId = req.params.userId
 
     User.findById(userId, (err, user) => {
-        if (err) return res.status(500).send({ message: `Error deleting the user: ${err}` })
+        if (err) return res.status(409).send({ message: `Error deleting the user: ${err}` })
 
         User.deleteOne(user, err => {
-            if (err) return res.status(500).send({ message: `Error deleting the user: ${err}` })
+            if (err) return res.status(409).send({ message: `Error deleting the user: ${err}` })
             res.status(200).send({ message: 'The user has been deleted successfully' })
         })
     })
