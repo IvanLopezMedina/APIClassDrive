@@ -21,6 +21,7 @@ const UserSchema = new Schema({
     },
     displayname: {
         type: String,
+        unique: true,
         required: true
     },
     password: {
@@ -29,11 +30,7 @@ const UserSchema = new Schema({
         minlength: 8,
         required: true
     },
-    country: {
-        type: String,
-        select: true,
-        required: true
-    },
+    groups: [],
     avatar: String,
     signupDate: {
         type: Date,
