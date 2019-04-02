@@ -6,16 +6,16 @@ const answerSchema = new Schema({
     author: String,
     date: { type: Date, default: Date.now() },
     answer: String,
-    likes: Number,
-    dislikes: Number
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 }
 })
 
 const postSchema = new Schema({
     title: String,
-    post_date: { type: Date, default: Date.now() },
+    date: { type: Date, default: Date.now() },
     author: String,
-    likes: Number,
-    dislikes: Number,
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 },
     userFavs: [ObjectId],
     answers: [answerSchema]
 })
@@ -24,12 +24,6 @@ const ForumSchema = new Schema({
     groupName: String,
     posts: [postSchema]
 })
-
-postSchema.methods.postEmpty = function (posts) {
-    let empty = false
-    if (posts == null) empty = true
-    return empty
-}
 
 const Forum = mongoose.model('forum', ForumSchema)
 const Answer = mongoose.model('answer', answerSchema)

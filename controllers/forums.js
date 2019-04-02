@@ -9,10 +9,24 @@ const getPosts = (req, res) => {
         res.status(200).send({ posts })
     })
 }
-
+/**
+ * Required fields on request body:
+ * @property {object} forum.posts                   - post documents to add
+ * @property {string} forum.posts.title             - title of post
+ * @property {date} forum.posts.date                - date of post
+ * @property {string} forum.posts.author            - author of post
+ * @property {int} forum.posts.likes                - count of likes
+ * @property {int} forum.posts.dislikes             - count of dislikes
+ * @property {array} forum.posts.userFavs           - array of users IDs
+ * @property {object} forum.posts.answers           - answer documents
+ * @property {string} forum.posts.answers.answer    - answer content
+ * 
+ * @param {*} req - request of function
+ * @param {*} res - response of function
+ */
 const addPost = (req, res) => {
-    if (req.body.posts == null) return res.status(500).send({ message: `Error post empty` })
-    else {
+    var valid = validPost(req, res)
+    if (valid[1]) {
         let forumId = req.params.forumId
         Forum.Forum.findById(forumId, (err, forum) => {
             if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
@@ -28,18 +42,20 @@ const addPost = (req, res) => {
                 forum.answers = req.body.answers
                 forum.answer = req.body.answer
                 forum.save((err) => {
-                    if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                    if (err) return res.status(500).send({ msg: `Error creating forum: ${err}` })
                     return res.status(200).send({ forum: forum })
                 })
             }
         })
+    } else {
+        return res.status(500).send({ message: valid[0] })
     }
 }
 
 const addAnswer = (req, res) => {
     /* REQUIRED FIELDS ON REQUEST BODY
      *  postId: Post in which the answer is inserted
-     *  answerBody: The content of the answer
+     *  answer: The content of the answer
      *  author: The answer's author
      *  date: date published
      *  likes: likes the answer has
@@ -63,22 +79,27 @@ const addAnswer = (req, res) => {
                     answer.likes = req.body.likes
                     answer.dislikes = req.body.dislikes
                     forum['posts'][i]['answers'] = forum.posts.i.answers.concat(answer)
-                    //forum.posts = forum['posts'].concat(post)
                 }
             }
-                /*
-                Forum.Forum.find({ `posts.${i}._id`: ObjectId(postId) }, (err, posts) => {
-                    if (err) return res.status(500).send({ message: `Could not find post: ${err}` })
-                    if (!post) return res.status(404).send({ message: `Post does not exist` })
-                   
-                })
-            }*/
             forum.save((err) => {
                 if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
                 return res.status(200).send({ forum: forum })
             })
         }
     })
+}
+
+const validPost = function (req, res) {
+    let posts = req.body.posts
+    if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
+    for (var i = 0; i < posts.length; i++) {
+        let title = posts[i]['title']
+        let author = posts[i]['author']
+        if (title == null || title === '') return [`Error title is empty`, false]
+        else if (author == null || author === '') return [`Error author is empty`, false]
+    }
+
+    return ['', true]
 }
 module.exports = {
     getPosts,
