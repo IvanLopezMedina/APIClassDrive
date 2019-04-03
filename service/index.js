@@ -13,19 +13,15 @@ function createToken (user) {
 }
 
 const decodeToken = (token) => {
-    const decoded = new Promise((resolve, reject) => {
-        try {
-            const payload = jwt.decode(token, config.SECRET_TOKEN)
-            if (payload.exp <= moment.unix()) {
-                Promise.reject(new Error('Error'), { status: 401, message: 'Token expired' })
-            }
-            resolve(payload.sub)
-        } catch (err) {
-            Promise.reject(new Error('Error'), { status: 500, message: 'Token expired' })
+    try {
+        const payload = jwt.decode(token, config.SECRET_TOKEN)
+        if (payload.exp <= moment.unix()) {
+            throw new Error('Error'), { status: 401, message: 'Token expired' }
         }
-    })
-
-    return decoded
+        return (payload.sub)
+    } catch (err) {
+        throw new Error('Error'), { status: 403, message: 'Unhandled Token Error' }
+    }
 }
 
 module.exports = {
