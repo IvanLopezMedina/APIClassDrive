@@ -9,21 +9,7 @@ const getPosts = (req, res) => {
         res.status(200).send({ posts })
     })
 }
-/**
- * Required fields on request body:
- * @property {object} forum.posts                   - post documents to add
- * @property {string} forum.posts.title             - title of post
- * @property {date} forum.posts.date                - date of post
- * @property {string} forum.posts.author            - author of post
- * @property {int} forum.posts.likes                - count of likes
- * @property {int} forum.posts.dislikes             - count of dislikes
- * @property {array} forum.posts.userFavs           - array of users IDs
- * @property {object} forum.posts.answers           - answer documents
- * @property {string} forum.posts.answers.answer    - answer content
- * 
- * @param {*} req - request of function
- * @param {*} res - response of function
- */
+
 const addPost = (req, res) => {
     var valid = validPost(req, res)
     if (valid[1]) {
@@ -51,7 +37,7 @@ const addPost = (req, res) => {
         return res.status(500).send({ message: valid[0] })
     }
 }
-/*
+
 const addAnswer = (req, res) => {
     /* REQUIRED FIELDS ON REQUEST BODY
      *  postId: Post in which the answer is inserted
@@ -61,7 +47,7 @@ const addAnswer = (req, res) => {
      *  likes: likes the answer has
      *  dislikes: dislikes the answer has
      * */
-/*
+
     let forumId = req.params.forumId
     let postId = req.body.postId
 
@@ -71,14 +57,17 @@ const addAnswer = (req, res) => {
         else {
             for (var i = 0; i < forum['posts'].length; i++) {
                 if (forum['posts'][i]['_id'].toString() === postId) {
-                    console.log('hola')
-                    let answer = new Forum.Answer()
-                    answer.answer = req.body.answer
-                    answer.author = req.body.author
-                    answer.date = req.body.date
-                    answer.likes = req.body.likes
-                    answer.dislikes = req.body.dislikes
-                    forum['posts'][i]['answers'] = forum.posts.i.answers.concat(answer)
+                    for (var j = 0; j < req.body.answers.length; j++) {
+                        let answer = new Forum.Answer()
+                        answer.answer = req.body.answers[j]['answer']
+                        answer.author = req.body.answers[j]['author']
+                        answer.date = req.body.answers[j]['date']
+                        answer.likes = req.body.answers[j]['likes']
+                        answer.dislikes = req.body.answers[j]['dislikes']
+                        console.log(req.body.answers[j]['answer'])
+                        console.log(forum['posts'][i])
+                        forum['posts'][i]['answers'].push(answer)
+                    }
                 }
             }
             forum.save((err) => {
@@ -88,7 +77,6 @@ const addAnswer = (req, res) => {
         }
     })
 }
-*/
 
 const validPost = function (req, res) {
     let posts = req.body.posts
@@ -104,6 +92,6 @@ const validPost = function (req, res) {
 }
 module.exports = {
     getPosts,
-    addPost
-    // addAnswer
+    addPost,
+    addAnswer
 }

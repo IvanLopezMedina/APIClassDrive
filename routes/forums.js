@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth')
 
 router.get('/posts/:forumId', forumsCtrl.getPosts)
 router.put('/addPost/:forumId', forumsCtrl.addPost)
-// router.put('/addAnswer/:forumId', forumsCtrl.addAnswer)
+router.put('/addAnswer/:forumId', forumsCtrl.addAnswer)
 /*
 router.get('/forums', forumsCtrl.getForums)
 router.put('/forums/:forumId', forumsCtrl.updateForum)
