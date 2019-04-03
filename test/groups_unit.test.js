@@ -3,7 +3,7 @@ const app = require('../app')
 const chai = require('chai')
 const request = require('supertest')
 const expect = chai.expect
-
+const assert = require('assert')
 const mongoose = require('mongoose')
 const config = require('../config')
 
@@ -28,7 +28,7 @@ describe('API Tests', function () {
         it('should get all the groups', function (done) {
             request(app).get('/api/groups').end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(500)
-                expect(res.statusCode).to.equal(200)
+                assert.strictEqual(res.statusCode, 200)
                 expect(res.body).to.be.an('array')
                 done()
             })
@@ -38,7 +38,7 @@ describe('API Tests', function () {
         it('should create a public group', function (done) {
             request(app).post('/api/groups').send(groupPublic).end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(500)
-                expect(res.statusCode).to.equal(200)
+                assert.strictEqual(res.statusCode, 200)
                 groupPublic = res.body
                 done()
             })
@@ -48,7 +48,7 @@ describe('API Tests', function () {
         it('should send error 403', function (done) {
             request(app).post('/api/groups').send(groupPrivateWithoutPass).end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(200)
-                expect(res.statusCode).to.equal(403)
+                assert.strictEqual(res.statusCode, 403)
                 groupPrivateWithoutPass = res.body
                 done()
             })
@@ -58,7 +58,7 @@ describe('API Tests', function () {
         it('should create a private group', function (done) {
             request(app).post('/api/groups').send(groupPrivate).end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(500)
-                expect(res.statusCode).to.equal(200)
+                assert.strictEqual(res.statusCode, 200)
                 groupPrivate = res.body
                 done()
             })
