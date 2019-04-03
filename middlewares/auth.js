@@ -1,7 +1,7 @@
 const services = require('../service')
 
 const isAuth = async (req, res, next) => {
-    if (!req.headers.authorization) {
+    if (!req.headers.authorization && !res.body.id) {
         return res.status(403).send({ message: 'Access forbidden' })
     }
 
@@ -9,12 +9,14 @@ const isAuth = async (req, res, next) => {
     try {
         const response = await services.decodeToken(token)
         req.user = response
-        next()
-    }
-    catch (e) {
-        res.status(e.status).send({message: e.message})
+        if (req.user === req.body.id) {
+            next()
+        } else {
+            return res.status(403).send({ message: 'Access forbidden. Invalid credentials' })
         }
-   
+    } catch (e) {
+        res.status(e.status).send({ message: e.message })
+    }
 }
 
 module.exports = isAuth
