@@ -4,15 +4,38 @@ const bcrypt = require('bcrypt-nodejs')
 const crypto = require('crypto')
 
 const UserSchema = new Schema({
-    name: String,
-    lastname: String,
-    email: { type: String, unique: true, lowercase: true },
-    displayName: String,
-    password: { type: String, select: false },
-    country: { type: String, select: true },
-    center: [String],
+    name: {
+        type: String,
+        required: true
+    },
+    lastname: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        unique: true,
+        lowercase: true,
+        required: true,
+        match: /\S+@\S+\.\S+/
+    },
+    displayname: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    password: {
+        type: String,
+        select: false,
+        minlength: 8,
+        required: true
+    },
+    groups: [],
     avatar: String,
-    signupDate: { type: Date, default: Date.now() },
+    signupDate: {
+        type: Date,
+        default: Date.now()
+    },
     lastLogin: Date
 },
 {
@@ -44,9 +67,9 @@ UserSchema.methods.gravatar = function (size) {
     return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`
 }
 
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
+UserSchema.methods.comparePassword = function (candidatePassword, onPasswordCompared) {
     bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-        cb(err, isMatch)
+        onPasswordCompared(err, isMatch)
     })
 }
 
