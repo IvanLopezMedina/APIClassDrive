@@ -1,5 +1,7 @@
 const Group = require('../models/group')
-// const { check, validationResult } = require('express-validator');
+// const { check, validationResult } = require('express-validator')
+// buit error
+// si no hi ha contrasenya invalid data
 
 const createGroup = (req, res) => {
     let group = new Group()
