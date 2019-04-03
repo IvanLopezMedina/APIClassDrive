@@ -9,11 +9,7 @@ const GroupSchema = Schema({
         type: String, 
         required: true,
         unique: true },
-    center: String,
-    tags: {
-        degree: String,
-        subject: String
-    },
+    tags: [],
     visibility: {
         type: String,
         enum: ['public', 'private'],
