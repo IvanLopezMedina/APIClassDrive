@@ -10,7 +10,7 @@ const GroupSchema = Schema({
         required: true,
         unique: true },
     center: String,
-    tags: [String],
+    tags: [],
     visibility: {
         type: String,
         enum: ['public', 'private'],

@@ -1,7 +1,5 @@
 const Group = require('../models/group')
-// const { check, validationResult } = require('express-validator')
-// buit error
-// si no hi ha contrasenya invalid data
+// const { check, validationResult } = require('express-validator');
 
 const createGroup = (req, res) => {
     let group = new Group()
@@ -19,7 +17,7 @@ const createGroup = (req, res) => {
         })
     } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
 }
-
+/*
 const getGroups = (req, res) => {
     Group.find(function (err, groups) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
@@ -27,7 +25,8 @@ const getGroups = (req, res) => {
 
         res.json(groups)
     })
-}
+} */
+
 const getGroup = (req, res) => {
     let groupId = req.params.groupId
 
@@ -50,6 +49,19 @@ const deleteGroup = (req, res) => {
             res.status(200).send({ message: 'The group has been deleted successfully' })
         })
     })
+}
+
+async function getGroups(req, res){
+
+    let infogroups = []
+    let groups = req.body.usergroups
+    for(let i=0; i<groups.length; i++) {
+        await Group.find({name : groups[i]}, function (err, infogroup) {
+            if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+            if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
+            infogroups.push(infogroup[0])
+    }).select("name tags avatar ")}
+    res.status(200).send(infogroups)
 }
 
 /*
@@ -76,5 +88,6 @@ module.exports = {
     deleteGroup,
     getGroup,
     getGroups
+
 }
 
