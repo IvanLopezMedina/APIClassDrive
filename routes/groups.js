@@ -8,6 +8,9 @@ router.delete('/groups/:groupId', groupCtrl.deleteGroup)
 router.get('/groups', groupCtrl.getGroups)
 router.get('/groups/:groupId', groupCtrl.getGroup)
 router.post('/getgroups', groupCtrl.getGroups)
+router.post('/searchgroups', groupCtrl.searchGroup)
+router.post('/getgroupswithsearch', groupCtrl.getGroupwithSearch)
+
 
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
