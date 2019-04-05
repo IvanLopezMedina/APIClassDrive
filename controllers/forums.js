@@ -10,6 +10,21 @@ const getPosts = (req, res) => {
     })
 }
 
+const getPost = (req, res) => {
+    let forumId = req.body.forumId
+    let postId = req.params.postId
+    Forum.Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
+        for (var i = 0; i < forum['posts'].length; i++) {
+            if (forum['posts'][i]['_id'].toString() === postId) {
+                let post = forum['posts'][i]
+                res.status(200).send({ post })
+            }
+        }
+    })
+}
+
 const addPost = (req, res) => {
     var valid = validPost(req, res)
     if (valid[1]) {
@@ -64,8 +79,6 @@ const addAnswer = (req, res) => {
                         answer.date = req.body.answers[j]['date']
                         answer.likes = req.body.answers[j]['likes']
                         answer.dislikes = req.body.answers[j]['dislikes']
-                        console.log(req.body.answers[j]['answer'])
-                        console.log(forum['posts'][i])
                         forum['posts'][i]['answers'].push(answer)
                     }
                 }
@@ -92,6 +105,7 @@ const validPost = function (req, res) {
 }
 module.exports = {
     getPosts,
+    getPost,
     addPost,
     addAnswer
 }
