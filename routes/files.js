@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 // const auth = require('../middlewares/auth')
 
-router.get('/users/:groupId', filesCtrl.getFiles)
+router.get('/files/:groupId', filesCtrl.getFiles)
+router.post('/files/', filesCtrl.addFile)
 
 module.exports = router

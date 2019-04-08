@@ -7,8 +7,7 @@ const FileSchema = new Schema({
         required: true
     },
     type: {
-        type: String,
-        required: true
+        type: String
     },
     uploadDate: {
         type: Date,
