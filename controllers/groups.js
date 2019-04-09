@@ -21,20 +21,19 @@ const createGroup = (req, res) => {
         })
     } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
 }
-/*
-const getGroups = (req, res) => {
-    Group.find(function (err, groups) {
-        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-        if (!groups) return res.status(404).send({ message: `The group doesn't exist: ${err}` })
-
-        res.json(groups)
-    })
-} */
-
 const getGroup = (req, res) => {
     let groupId = req.params.groupId
 
     Group.findById(groupId, (err, group) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!group) return res.status(404).send({ message: `The group doesn't exist: ${err}` })
+
+        res.status(200).send(group)
+    })
+}
+
+const getGroupName = (req, res) => {
+    Group.findOne({ name: req.body.name }, (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `The group doesn't exist: ${err}` })
 
@@ -99,5 +98,6 @@ module.exports = {
     getGroup,
     getGroups,
     searchGroup,
-    getGroupwithSearch
+    getGroupwithSearch,
+    getGroupName
 }
