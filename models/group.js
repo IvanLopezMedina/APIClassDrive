@@ -5,8 +5,8 @@ const crypto = require('crypto')
 const bcrypt = require('bcrypt-nodejs')
 
 const GroupSchema = Schema({
-    name: { 
-        type: String, 
+    name: {
+        type: String,
         required: true,
         unique: true },
     tags: [],
