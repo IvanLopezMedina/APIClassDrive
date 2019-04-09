@@ -91,6 +91,29 @@ const addAnswer = (req, res) => {
     })
 }
 
+const updateForum = (req, res) => {
+    let forumId = req.params.forumId
+    Forum.Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
+        else {
+            forum.posts = req.body.posts
+            forum.title = req.body.title
+            forum.date = req.body.date
+            forum.author = req.body.author
+            forum.likes = req.body.likes
+            forum.dislikes = req.body.dislikes
+            forum.userFavs = req.body.userfavs
+            forum.answers = req.body.answers
+            forum.answer = req.body.answer
+            forum.save((err) => {
+                if (err) return res.status(500).send({ msg: `Error creating forum: ${err}` })
+                return res.status(200).send({ forum: forum })
+            })
+        }
+    })
+}
+
 const validPost = function (req, res) {
     let posts = req.body.posts
     if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
@@ -107,5 +130,6 @@ module.exports = {
     getPosts,
     getPost,
     addPost,
-    addAnswer
+    addAnswer,
+    updateForum
 }
