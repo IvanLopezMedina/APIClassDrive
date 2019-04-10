@@ -140,22 +140,19 @@ const deleteForumElement = function (req, res) {
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
         else {
             for (var i = 0; i < forum['posts'].length; i++) {
-                if (forum['posts'][i]['_id'].toString() === idToDelete) {
+                if (forum['posts'][i]['_id'].toString() === elementToDelete) {
                     forum['posts'].splice(i, 1)
-                    return res.status(200).send({ message: 'Post Deleted successfully' })
                     forum.save((err) => {
                         if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
-                        return res.status(200).send({ forum: forum })
+                        return res.status(200).send({ message: 'Post Deleted successfully' })
                     })
-                }
-                else {
-                    for (var j = 0; j < req.body.answers.length; j++) {
-                        if (forum['posts'][i]['answers'][j]['_id'].toString() === idToDelete) {
+                } else {
+                    for (var j = 0; j < forum['posts'][i]['answers'].length; j++) {
+                        if (forum['posts'][i]['answers'][j]['_id'].toString() === elementToDelete) {
                             forum['posts'][i]['answers'].splice(j, 1)
-                            return res.status(200).send({ message: 'Answer Deleted successfully' })
                             forum.save((err) => {
                                 if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
-                                return res.status(200).send({ forum: forum })
+                                return res.status(200).send({ message: 'Answer Deleted successfully' })
                             })
                         }
                     }
