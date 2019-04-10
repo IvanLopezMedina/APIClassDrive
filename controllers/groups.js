@@ -2,15 +2,12 @@ const Group = require('../models/group')
 // const { check, validationResult } = require('express-validator');
 
 const createGroup = (req, res) => {
-
     let group = new Group()
     let id = req.body.user
     group.name = req.body.name
-    group.visibility = req.body.visibility
     group.tags = req.body.tags
-    //if ('private'.match(req.body.visibility) || 'closed'.match(req.body.visibility)) group.password = req.body.password
+    group.visibility = req.body.visibility
     if ('private'.match(req.body.visibility)) group.password = req.body.password
-    //if ('public'.match(req.body.visibility) || 'private'.match(req.body.visibility)) group.tags = req.body.tags
     group.admin = id
     group.users = [id]
     group.avatar = group.gravatar()
@@ -67,7 +64,7 @@ const searchGroup = (req, res) => {
         return res.status(200).send(groups)
         })
     }
-  
+	  
 const getGroupwithSearch = (req, res) => {
     let search = req.body.search
     Group.find({name : new RegExp('^'+search+'.*$', "i")}, {'_id' : 0, 'name' : 1, 'tags' : 1, 'visibility' : 1, 'users': 1}, {sort: {name: 1}, limit: 10}, (err, search) => {
@@ -79,10 +76,9 @@ const getGroupwithSearch = (req, res) => {
         console.log(groups)
         if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
         return res.status(200).send(groups)
-        })
-    }
-
-//function for menu
+      })
+  }
+	
 async function getGroups(req, res){
 
     let infogroups = []
@@ -96,9 +92,8 @@ async function getGroups(req, res){
     res.status(200).send(infogroups)
 }
 
-
+/*
 const subscribe = (req, res) =>{
-    /*
     let groupId = req.params.groupId
     let.groupPassword = req.params.password
     if(validaation = false){
@@ -112,9 +107,9 @@ const subscribe = (req, res) =>{
     } else {
         retornar algun error amb missatge que no coincideix les contrasenyes
     }
-    }*/
+    }
 }
-
+*/
 
 module.exports = {
     createGroup,
@@ -123,4 +118,6 @@ module.exports = {
     getGroups,
     searchGroup,
     getGroupwithSearch
+
 }
+

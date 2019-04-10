@@ -60,8 +60,8 @@ const updateUser = (req, res) => {
 
     User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
         if (err) return res.status(409).send({ message: `Error updating product: ${err}` })
-
-        res.status(200).send({ user: userUpdated })
+        
+      res.status(200).send({ user: userUpdated })
     })
 }
 
