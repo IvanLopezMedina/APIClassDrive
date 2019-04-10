@@ -57,4 +57,32 @@ describe('API Tests', function () {
             })
         })
     })
+    describe('## Subscribe a member ', function () {
+        it('should subscribe ', function (done) {
+            request(app).put('/api/subscribe/5c98b2116c3e6d3eac21142d').end(function (err, res) {
+                if (err) assert.strictEqual(404, res.statusCode)
+                assert.strictEqual(200, res.statusCode)
+                // com es fa per pasarli al id del usuari
+                done()
+            })
+        })
+    })
+    describe('## Subscribe a member ', function () {
+        it('should send an error because the id is invalid', function (done) {
+            request(app).put('/api/subscribe/5c8ce2bb8e0a6e1588d073cf').end(function (err, res) {
+                if (err) assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(404, res.statusCode)
+                done()
+            })
+        })
+    })
+    describe('## Subscribe a member ', function () {
+        it('should send an error because the password is incorrect', function (done) {
+            request(app).put('/api/subscribe/5c8ce2bb8e0a6e1588d073cf').end(function (err, res) {
+                if (err) assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(404, res.statusCode)
+                done()
+            })
+        })
+    })
 })

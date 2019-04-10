@@ -82,24 +82,19 @@ const subscribe = (req, res) => {
     let groupId = req.params.groupId
     let userId = req.body.userId
     let password = req.body.password
+    console.log(userId)
     Group.findById(groupId, (err, group) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
-        if (!group) return res.status(404).send({ message: `Forum doesn't exist` })
+        if (!group) return res.status(404).send({ message: `Group doesn't exist` })
         else {
             console.log('Hola')
             if (!group.validatePassword) {
-                console.log(group.users)
                 group.users.push(userId)
-                console.log(group.users)
             } else {
                 console.log(password)
                 console.log(group.password)
-                console.log(group.users)
-                console.log(group.name)
                 if (group.password === password) {
-                    console.log(group.users)
                     group.users.push(userId)
-                    console.log(group.users)
                 } else {
                     return res.status(500).send({ message: `Incorrect Pasword` })
                 }

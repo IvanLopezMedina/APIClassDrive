@@ -16,8 +16,7 @@ const GroupSchema = Schema({
         required: true
     },
     password: {
-        type: String,
-        select: false
+        type: String
     //    minlength: 8
     },
     admin: ObjectId,
