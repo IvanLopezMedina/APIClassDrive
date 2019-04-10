@@ -1,5 +1,13 @@
 const Forum = require('../models/forum')
 
+const createForum = (groupName, res) => {
+    var forum = new Forum.Forum()
+    forum.groupName = groupName
+    forum.save((err) => {
+        if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+    })
+}
+
 const getPosts = (req, res) => {
     let forumId = req.params.forumId
     Forum.Forum.findById(forumId, (err, forum) => {
@@ -93,5 +101,6 @@ const validPost = function (req, res) {
 module.exports = {
     getPosts,
     addPost,
-    addAnswer
+    addAnswer,
+    createForum
 }
