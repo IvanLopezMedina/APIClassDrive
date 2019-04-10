@@ -1,4 +1,5 @@
 const Group = require('../models/group')
+const forumCtrl = require('./forums')
 // const { check, validationResult } = require('express-validator');
 
 const createGroup = (req, res) => {
@@ -15,6 +16,8 @@ const createGroup = (req, res) => {
         group.admin = id
         group.users = [id]
         group.avatar = group.gravatar()
+
+        forumCtrl.createForum(req.body.name, res)
 
         if (group.validatePassword() || 'public'.match(req.body.visibility)) {
             group.save((err) => {
