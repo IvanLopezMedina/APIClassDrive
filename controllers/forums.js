@@ -126,10 +126,52 @@ const validPost = function (req, res) {
 
     return ['', true]
 }
+
+const deleteForumElement = function (req, res) {
+    /*
+     REQUIRED FIELDS ON REQUEST BODY:
+        idToDelete: Id of the forum element you want to delete
+     
+     */
+    let forumId = req.params.forumId
+    let elementToDelete = req.body.idToDelete
+    // Se if element is a post or an answer
+    Forum.Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
+        else {
+            for (var i = 0; i < forum['posts'].length; i++) {
+                if (forum['posts'][i]['_id'].toString() === idToDelete) {
+                    forum['posts'].splice(i, 1)
+                    return res.status(200).send({ message: 'Post Deleted successfully' })
+                    forum.save((err) => {
+                        if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                        return res.status(200).send({ forum: forum })
+                    })
+                }
+                else {
+                    for (var j = 0; j < req.body.answers.length; j++) {
+                        if (forum['posts'][i]['answers'][j]['_id'].toString() === idToDelete) {
+                            forum['posts'][i]['answers'].splice(j, 1)
+                            return res.status(200).send({ message: 'Answer Deleted successfully' })
+                            forum.save((err) => {
+                                if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                                return res.status(200).send({ forum: forum })
+                            })
+                        }
+                    }
+                }
+            }
+            return res.status(500)
+        }
+    })
+}
+
+
 module.exports = {
     getPosts,
     getPost,
     addPost,
-    addAnswer,
     updateForum
+    deleteForumElement
 }

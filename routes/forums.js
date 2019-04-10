@@ -8,6 +8,7 @@ router.get('/post/:postId', forumsCtrl.getPost)
 router.put('/addPost/:forumId', forumsCtrl.addPost)
 router.put('/addAnswer/:forumId', forumsCtrl.addAnswer)
 router.put('/updateForum/:forumId', forumsCtrl.updateForum)
+router.delete('/deleteForumElement/:forumId', forumsCtrl.deleteForumElement)
 // Adding auth to the method, we ensure that the forum has a valid token
 // The token is send in the request body, with the tag: Authorization
 
