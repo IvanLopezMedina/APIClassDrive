@@ -26,7 +26,7 @@ const getPost = (req, res) => {
 }
 
 const addPost = (req, res) => {
-    var valid = validPost(req, res)
+    var valid = validPost(req)
     if (valid[1]) {
         let forumId = req.params.forumId
         Forum.Forum.findById(forumId, (err, forum) => {
@@ -114,7 +114,7 @@ const updateForum = (req, res) => {
     })
 }
 
-const validPost = function (req, res) {
+const validPost = function (req) {
     let posts = req.body.posts
     if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
     for (var i = 0; i < posts.length; i++) {
@@ -131,7 +131,6 @@ const deleteForumElement = function (req, res) {
     /*
      REQUIRED FIELDS ON REQUEST BODY:
         idToDelete: Id of the forum element you want to delete
-     
      */
     let forumId = req.params.forumId
     let elementToDelete = req.body.idToDelete
@@ -167,11 +166,11 @@ const deleteForumElement = function (req, res) {
     })
 }
 
-
 module.exports = {
     getPosts,
     getPost,
     addPost,
-    updateForum
+    updateForum,
+    addAnswer,
     deleteForumElement
 }
