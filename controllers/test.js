@@ -29,9 +29,9 @@ const getAllTest = (req, res) => {
 }
 
 const getTest = (req, res) => {
-    let groupName = req.params.groupName
+    let testId = req.params.testId
 
-    Test.findById(groupName, (err, test) => {
+    Test.findById(testId, (err, test) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
 
