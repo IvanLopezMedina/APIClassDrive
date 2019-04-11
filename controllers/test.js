@@ -1,17 +1,11 @@
 const Test = require('../models/test')
-const service = require('../service')
 
 const addTest = (req, res) => {
     let test = new Test()
     test.groupName = req.body.groupName
     test.questions = req.body.questions
 
-    user.save(err => {
-        try{
-            var error = err.toString().split(':')[3].split('_')[0]
-        } catch { 
-            var error = ''
-        }
+    test.save(err => {
         if (err) return res.status(409).send({ msg: `${error} ya existe. Utilice otro ${error}` })
         return res.status(200).send({ msg: `Test added successful` })
     })
