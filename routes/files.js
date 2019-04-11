@@ -4,6 +4,6 @@ const router = express.Router()
 // const auth = require('../middlewares/auth')
 
 router.get('/files/:groupId', filesCtrl.getFiles)
-router.post('/files/', filesCtrl.addFile)
+router.post('/files/addFile/:groupName', filesCtrl.addFile)
 
 module.exports = router

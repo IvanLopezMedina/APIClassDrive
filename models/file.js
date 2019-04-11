@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const moment = require('moment')
 
 const FileSchema = new Schema({
     name: {
@@ -7,6 +8,9 @@ const FileSchema = new Schema({
         required: true
     },
     type: {
+        type: String
+    },
+    path: {
         type: String
     },
     uploadDate: {
