@@ -16,7 +16,7 @@ const addFile = (req, res) => {
         let fileSplitted = req.body.name.toString().split('.')
         file.name = fileSplitted[0]
         file.type = fileSplitted[1]
-        file.path = 'files/' + req.params.groupName.toString() + req.body.name.toString()
+        file.path = 'files/' + req.params.groupName.toString() + '/' + req.body.name.toString()
         if (fileSplitted.length === 2) invalid = false
         else error = 'Invalid format'
     } catch (e) {
