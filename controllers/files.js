@@ -6,6 +6,17 @@ const getFiles = (req, res) => {
     let groupName = req.params.groupName
 }
 
+const getFile = (req, res) => {
+    let groupName = req.params.groupName
+    let fileid = req.body.id
+    // Example for Marta. Hay que buscar primero el nombre del archivo a través del _id que nos dan
+    fs.readFile('files/' + groupName + '/report.pdf', function (err, data) {
+        if (err) throw err
+        const pdf = data.toString('base64')
+        console.log(pdf)
+    })
+}
+
 const addFile = (req, res) => {
     let file = new File()
     let error = ''
