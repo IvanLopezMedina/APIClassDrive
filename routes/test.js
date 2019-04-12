@@ -8,7 +8,7 @@ router.get('/test/:groupName', testCtrl.gestTest)
 router.put('/editTest/:testId', testCtrl.editTest)
 router.put('/deleteTest/:testId', testCtrl.deleteTest)
 
-router.post('/addTest/:testId', testCtrl.addTest)
+router.post('/addTest', testCtrl.addTest)
 
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization

@@ -2,13 +2,19 @@ const Test = require('../models/test')
 
 const addTest = (req, res) => {
     let test = new Test()
+    test.name = req.body.name
     test.groupName = req.body.groupName
     test.questions = req.body.questions
-
+    test.answers = req.body.answers
+    test.correctAnswer = req.body.correctAnswer
+    console.log(test.name)
+    console.log(test.groupName)
+    console.log(test.questions)
     test.save(err => {
         if (err) return res.status(409).send({ msg: `${error} ya existe. Utilice otro ${error}` })
         return res.status(200).send({ msg: `Test added successful` })
     })
+    
 }
 
 const getAllTest = (req, res) => {
