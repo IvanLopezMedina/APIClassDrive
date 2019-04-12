@@ -13,25 +13,23 @@ const addFile = (req, res) => {
     try {
         var form = new formidable.IncomingForm()
         form.parse(req, function (err, fields) {
-            if (err) console.log(err)
+            if (err) return res.status(409).send({ msg: `Error uploading the file: ${error}` })
             var extension = fields.file.split(',')[0].split('/')[1].split(';')[0]
             var data = fields.file.split(',')[1]
 
-            if (req.params.groupName === null || fields.file === null || fields.name === null) invalid = true
+            if (req.params.groupName !== null || fields.file !== null || fields.name !== null) invalid = false
             else error = 'Invalid group'
             file.name = fields.name
             file.type = extension
-            file.path = 'files/' + req.params.groupName.toString() + '/'
+            file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
 
             if (!fs.existsSync('files/' + req.params.groupName)) {
                 fs.mkdirSync('files/' + req.params.groupName)
             }
 
             let base64data = data.replace(/^data:.*/, '')
-            fs.writeFile(file.path + file.name, base64data, 'base64', (err) => {
-                if (err) {
-                    console.log(err)
-                }
+            fs.writeFile(file.path, base64data, 'base64', (err) => {
+                if (err) return res.status(409).send({ msg: `Error uploading the file: ${error}` })
             })
 
             file.save((err) => {
