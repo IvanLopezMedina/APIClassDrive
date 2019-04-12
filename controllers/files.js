@@ -7,13 +7,21 @@ const getFiles = (req, res) => {
 }
 
 const getFile = (req, res) => {
-    let groupName = req.params.groupName
-    let fileid = req.body.id
     // Example for Marta. Hay que buscar primero el nombre del archivo a través del _id que nos dan
-    fs.readFile('files/' + groupName + '/report.pdf', function (err, data) {
-        if (err) throw err
-        const pdf = data.toString('base64')
-        console.log(pdf)
+    let groupName = req.params.groupName
+    console.log('files')
+    let fileId = req.body.id
+    console.log(fileId)
+    File.findById(fileId, (err, file) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!file) return res.status(404).send({ message: `The file doesn't exist: ${err}` })
+
+        fs.readFile(file.path, function (err, data) {
+            if (err) throw err
+            const file = data.toString('base64')
+            res.status(200).send({ file })
+            console.log(file)
+        })
     })
 }
 
@@ -55,5 +63,6 @@ const addFile = (req, res) => {
 
 module.exports = {
     getFiles,
+    getFile,
     addFile
 }
