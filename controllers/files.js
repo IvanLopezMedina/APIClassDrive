@@ -1,4 +1,5 @@
 const File = require('../models/file')
+const formidable = require('formidable')
 
 const getFiles = (req, res) => {
     let groupName = req.params.groupName
@@ -10,7 +11,13 @@ const addFile = (req, res) => {
     let invalid = true
     
     try {
-        console.log(req.params)
+        var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields) {
+        // `file` is the name of the <input> field of type `file`
+            if (err) console.log(err)
+            console.log(fields)
+        })
+
         if (req.params.groupName === null) invalid = true
         else error = 'Invalid group'
         let fileSplitted = req.body.name.toString().split('.')
