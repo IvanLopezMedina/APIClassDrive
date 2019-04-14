@@ -18,7 +18,7 @@ const questionsSchema = new Schema({
 })
 
 const test = mongoose.model('test', TestSchema)
-const questions = mongoose.model('answer', questionsSchema)
+const questions = mongoose.model('questions', questionsSchema)
 
 module.exports = {
     test,
