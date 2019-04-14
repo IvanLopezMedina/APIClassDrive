@@ -56,7 +56,6 @@ const deleteGroup = (req, res) => {
         if (err) return res.status(500).send({ message: `Error deleting the group: ${err}` })
         forumCtrl.deleteForum(group.name)
         res.status(200).send({ message: 'The group has been deleted successfully' })
-        
     })
 }
 
@@ -104,8 +103,37 @@ const subscribe = (req, res) => {
                 } else {
                     return res.status(500).send({ message: `Incorrect Pasword` })
                 }
-                return res.status(200).send(group)
+                group.save((err) => {
+                    if (err) return res.status(409).send({ msg: `Error subscribing a group: ${err}` })
+                    return res.status(200).send({ group: group })
+                })
             }
+        }
+    })
+}
+const unsubscribe = (req, res) => {
+    let groupId = req.params.groupId
+    let userId = req.body.userId
+    let trobat = false
+    let i = 0
+    Group.findById(groupId, (err, group) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!group) return res.status(404).send({ message: `Group doesn't exist` })
+        else {
+            console.log('aa')
+            while (!trobat && i < group.users.length) {
+                if (userId === group.users[i]) {
+                    console.log('Ha entrat el bucle')
+                    trobat = true
+                    group.users.splice(i)
+                    return res.status(200).send(group, { message: `User eliminated` })
+                }
+                i++
+                console.log(i)
+                console.log(group.users[i])
+                console.log(userId)
+            }
+            return res.status(200).send(group)
         }
     })
 }
@@ -145,5 +173,6 @@ module.exports = {
     searchGroup,
     getGroupwithSearch,
     getGroupName,
-    subscribe
+    subscribe,
+    unsubscribe
 }

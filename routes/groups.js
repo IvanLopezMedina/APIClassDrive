@@ -12,7 +12,7 @@ router.post('/searchgroups', groupCtrl.searchGroup)
 router.post('/getgroupswithsearch', groupCtrl.getGroupwithSearch)
 router.get('/groupsname/:name', groupCtrl.getGroupName)
 router.put('/subscribe/:groupId', groupCtrl.subscribe)
-
+router.put('/unsubscribe/:groupId', groupCtrl.unsubscribe)
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
 router.get('/private', auth, function (req, res) {
