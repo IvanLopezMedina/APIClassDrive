@@ -4,7 +4,7 @@ const router = express.Router()
 const auth = require('../middlewares/auth')
 
 router.get('/alltests/:groupName', testCtrl.getAllTest)
-router.get('/test/:groupName', testCtrl.gestTest)
+router.get('/test/:groupName', testCtrl.getTest)
 router.put('/edittest/:testId', testCtrl.editTest)
 router.put('/deletetest/:testId', testCtrl.deleteTest)
 

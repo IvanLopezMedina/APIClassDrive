@@ -1,7 +1,7 @@
 const Test = require('../models/test')
 
 const addTest = (req, res) => {
-    let test = new Test()
+    let test = new Test.Test()
     test.name = req.body.name
     test.groupName = req.body.groupName
     test.questions = req.body.questions
@@ -11,10 +11,9 @@ const addTest = (req, res) => {
     console.log(test.groupName)
     console.log(test.questions)
     test.save(err => {
-        if (err) return res.status(409).send({ msg: `${error} ya existe. Utilice otro ${error}` })
+        if (err) return res.status(409).send({ msg: `${ err } ya existe. Utilice otro ${ err }` })
         return res.status(200).send({ msg: `Test added successful` })
     })
-    
 }
 
 const getAllTest = (req, res) => {
@@ -45,8 +44,7 @@ const editTest = (req, res) => {
 
     Test.findByIdAndUpdate(testId, update, (err, testUpdated) => {
         if (err) return res.status(409).send({ message: `Error updating test: ${err}` })
-        
-      res.status(200).send({ test: testUpdated })
+        res.status(200).send({ test: testUpdated })
     })
 }
 
@@ -62,7 +60,6 @@ const deleteTest = (req, res) => {
         })
     })
 }
-
 
 module.exports = {
     addTest,

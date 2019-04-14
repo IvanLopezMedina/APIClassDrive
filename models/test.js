@@ -17,10 +17,10 @@ const questionsSchema = new Schema({
     correctAnswer: [String]
 })
 
-const test = mongoose.model('test', TestSchema)
-const questions = mongoose.model('questions', questionsSchema)
+const Test = mongoose.model('test', TestSchema)
+const Questions = mongoose.model('questions', questionsSchema)
 
 module.exports = {
-    test,
-    questions
+    Test,
+    Questions
 }
