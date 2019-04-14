@@ -56,7 +56,6 @@ const deleteGroup = (req, res) => {
         if (err) return res.status(500).send({ message: `Error deleting the group: ${err}` })
         forumCtrl.deleteForum(group.name)
         res.status(200).send({ message: 'The group has been deleted successfully' })
-        
     })
 }
 
@@ -124,6 +123,21 @@ async function getGroups (req, res) {
     res.status(200).send(infogroups)
 }
 
+function getUsers (req, res) {
+    let groupId = req.params.groupId
+
+    Group.findById(groupId, (err, group) => {
+        if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
+        if (!group) return res.status(404).send({ msg: `Group doesnt exist: ${err}` })
+
+        if (group.users == null || group.users === '' || group.users.length === 0) {
+            return res.status(404).send({ msg: `Error: users is empty: ${err}` })
+        } else {
+            return res.status(200).send(group.users)
+        }
+    })
+}
+
 const validGroup = function (req) {
     let name = req.body.name
     let center = req.body.center
@@ -145,5 +159,6 @@ module.exports = {
     searchGroup,
     getGroupwithSearch,
     getGroupName,
-    subscribe
+    subscribe,
+    getUsers
 }
