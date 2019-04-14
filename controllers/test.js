@@ -17,9 +17,7 @@ const addTest = (req, res) => {
 }
 
 const getAllTest = (req, res) => {
-    let groupName = req.params.groupName
-
-    Test.findById(groupName, (err, test) => {
+    Test.Test.find({ groupName: req.params.groupName }, (err, test) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
 
@@ -30,7 +28,7 @@ const getAllTest = (req, res) => {
 const getTest = (req, res) => {
     let testId = req.params.testId
 
-    Test.findById(testId, (err, test) => {
+    Test.Test.findById(testId, (err, test) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
 
@@ -42,7 +40,7 @@ const editTest = (req, res) => {
     let testId = req.params.testId
     let update = req.body
 
-    Test.findByIdAndUpdate(testId, update, (err, testUpdated) => {
+    Test.Test.findByIdAndUpdate(testId, update, (err, testUpdated) => {
         if (err) return res.status(409).send({ message: `Error updating test: ${err}` })
         res.status(200).send({ test: testUpdated })
     })
@@ -51,7 +49,7 @@ const editTest = (req, res) => {
 const deleteTest = (req, res) => {
     let testId = req.params.testId
 
-    Test.findById(testId, (err, test) => {
+    Test.Test.findById(testId, (err, test) => {
         if (err) return res.status(409).send({ message: `Error deleting the test: ${err}` })
 
         Test.deleteOne(test, err => {
