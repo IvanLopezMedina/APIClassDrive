@@ -2,8 +2,12 @@ const File = require('../models/file')
 const formidable = require('formidable')
 const fs = require('fs')
 
-const getFiles = (req, res) => {
-    let groupName = req.params.groupName
+const getFiles = async (req, res) => {
+    await File.find({ groupName: req.params.groupName }, (err, files) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!files) return res.status(404).send({ message: `No files: ${err}` })
+        return res.status(200).send({ files })
+    }).select('_id, name type')
 }
 
 const getFile = (req, res) => {
@@ -40,6 +44,7 @@ const addFile = (req, res) => {
             else error = 'Invalid group'
             file.name = fields.name
             file.type = extension
+            file.groupName = req.body.usergroups
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
 
             if (!fs.existsSync('files/' + req.params.groupName)) {

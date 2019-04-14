@@ -9,6 +9,10 @@ const FileSchema = new Schema({
     type: {
         type: String
     },
+    groupName: {
+        type: String,
+        required: true
+    },
     path: {
         type: String
     },
