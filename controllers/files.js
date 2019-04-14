@@ -44,7 +44,7 @@ const addFile = (req, res) => {
             else error = 'Invalid group'
             file.name = fields.name
             file.type = extension
-            file.groupName = req.body.usergroups
+            file.groupName = req.body.groupName
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
 
             if (!fs.existsSync('files/' + req.params.groupName)) {
