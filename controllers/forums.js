@@ -86,6 +86,13 @@ const addAnswer = (req, res) => {
     })
 }
 
+const deleteForum = function (name) {
+    Forum.Forum.findOneAndRemove({ groupName: name }, (err, forum) => {
+        if (err) return { message: `Error deleting the forum: ${err}` }
+        return { message: 'The forum has been deleted successfully' }
+    })
+}
+
 const validPost = function (req, res) {
     let posts = req.body.posts
     if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
@@ -102,5 +109,6 @@ module.exports = {
     getPosts,
     addPost,
     addAnswer,
-    createForum
+    createForum,
+    deleteForum
 }

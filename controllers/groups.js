@@ -52,13 +52,11 @@ const getGroupName = (req, res) => {
 const deleteGroup = (req, res) => {
     let groupId = req.params.groupId
 
-    Group.findById(groupId, (err, group) => {
+    Group.findByIdAndRemove(groupId, (err, group) => {
         if (err) return res.status(500).send({ message: `Error deleting the group: ${err}` })
-
-        Group.deleteOne(group, err => {
-            if (err) return res.status(500).send({ message: `Error deleting the group: ${err}` })
-            res.status(200).send({ message: 'The group has been deleted successfully' })
-        })
+        forumCtrl.deleteForum(group.name)
+        res.status(200).send({ message: 'The group has been deleted successfully' })
+        
     })
 }
 
