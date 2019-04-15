@@ -15,7 +15,7 @@ const TestSchema = new Schema({
 
 const questionsSchema = new Schema({
     question: String,
-    answers: [String],
+    answer: [String],
     correctAnswer: [String]
 })
 
