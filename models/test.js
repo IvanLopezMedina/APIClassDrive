@@ -7,8 +7,10 @@ const TestSchema = new Schema({
         required: true,
         unique: true },
     groupName: {
-        type: String
-    }
+        type: String},
+    },
+    {
+    versionKey: false
 })
 
 const questionsSchema = new Schema({
