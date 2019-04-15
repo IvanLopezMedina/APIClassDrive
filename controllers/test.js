@@ -13,8 +13,12 @@ const addTest = (req, res) => {
     test.questions.push(question)
 
     test.save(err => {
-        if (err) return res.status(409).send({ msg: `${err} ya existe. Utilice otro ${err}` })
-        return res.status(200).send({ msg: `Test added successful` })
+
+        if (err) {
+            if (err.message.includes('duplicate key error') && err.name === 'MongoError') return res.status(409).send({ msg: `Un test con el nombre -${test.name}- ya existe. Utilice otro nombre` })
+            return res.status(409).send({ msg: `Unhandled error: ${err.message}` })
+        }
+        return res.status(200).send({ msg: `Test added successfully` })
     })
 }
 
