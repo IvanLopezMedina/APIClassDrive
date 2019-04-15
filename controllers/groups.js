@@ -90,7 +90,6 @@ const subscribe = (req, res) => {
     let password = req.body.password
     let groupName = req.body.groupName
     let valid = false
-    let message = 'Correct Subscribed'
 
     Group.findById(groupId, async (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
@@ -113,7 +112,7 @@ const subscribe = (req, res) => {
                 User.updateOne({ _id: userId, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
                     if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
                     if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-                    res.status(200).send({ msg: message })
+                    res.status(200).send({ msg: 'Correct Subscribed' })
                 })
             })
         } else res.status(409).send({ msg: `Invalid Password` })
