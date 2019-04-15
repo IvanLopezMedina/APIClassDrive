@@ -61,8 +61,22 @@ const addFile = (req, res) => {
     }
 }
 
+const deleteFile = (req, res) => {
+    let fileId = req.params.fileId
+
+    File.findById(fileId, (err, file) => {
+        if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
+
+        File.deleteOne(file, err => {
+            if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
+            res.status(200).send({ message: 'The file has been deleted successfully' })
+        })
+    })
+}
+
 module.exports = {
     getFiles,
     getFile,
-    addFile
+    addFile,
+    deleteFile
 }
