@@ -15,8 +15,8 @@ router.get('/groupusers/:groupId', groupCtrl.getUsers)
 
 router.delete('/groups/:groupId', groupCtrl.deleteGroup)
 
-router.put('/subscribe/:groupId', groupCtrl.subscribe)
-
+router.put('/subscribe', groupCtrl.subscribe)
+router.put('/unsubscribe/:groupId', groupCtrl.unsubscribe)
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
 router.get('/private', auth, function (req, res) {

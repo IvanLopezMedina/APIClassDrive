@@ -1,4 +1,5 @@
 const Group = require('../models/group')
+const User = require('../models/user')
 const forumCtrl = require('./forums')
 // const { check, validationResult } = require('express-validator');
 
@@ -84,27 +85,63 @@ const getGroupwithSearch = (req, res) => {
     })
 }
 const subscribe = (req, res) => {
-    let groupId = req.params.groupId
+    let groupId = req.body.groupId
     let userId = req.body.userId
     let password = req.body.password
-    console.log(userId)
+    let groupName = req.body.groupName
+    let valid = false
+
+    Group.findById(groupId, async (err, group) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!group) return res.status(404).send({ message: `Group doesn't exist` })
+        if (group.visibility === 'public') valid = true
+        else {
+            if (group.validatePassword) {
+                await group.comparePassword(password, async (err, isMatch) => {
+                    if (err) return res.status(409).send({ msg: `Subscribing password error: ${err}` })
+                    if (!isMatch) return res.status(404).send({ msg: `Password incorrect` })
+                    valid = isMatch
+                })
+            }
+        }
+        if (valid) {
+            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+            Group.updateOne({ _id: groupId, users: { $ne: userId } }, { $push: { users: userId } }, (err, result) => {
+                if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
+                if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
+                User.updateOne({ _id: userId, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
+                    if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
+                    if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
+                    res.status(200).send({ msg: 'Correct Subscribed' })
+                })
+            })
+        } else res.status(409).send({ msg: `Invalid Password` })
+    })
+}
+
+const unsubscribe = (req, res) => {
+    let groupId = req.params.groupId
+    let userId = req.body.userId
+    let trobat = false
+    let i = 0
     Group.findById(groupId, (err, group) => {
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `Group doesn't exist` })
         else {
-            console.log('Hola')
-            if (!group.validatePassword) {
-                group.users.push(userId)
-            } else {
-                console.log(password)
-                console.log(group.password)
-                if (group.password === password) {
-                    group.users.push(userId)
-                } else {
-                    return res.status(500).send({ message: `Incorrect Pasword` })
+            console.log('aa')
+            while (!trobat && i < group.users.length) {
+                if (userId === group.users[i]) {
+                    console.log('Ha entrat el bucle')
+                    trobat = true
+                    group.users.splice(i)
+                    return res.status(200).send(group, { message: `User eliminated` })
                 }
-                return res.status(200).send(group)
+                i++
+                console.log(i)
+                console.log(group.users[i])
+                console.log(userId)
             }
+            return res.status(200).send(group)
         }
     })
 }
@@ -118,6 +155,7 @@ async function getGroups (req, res) {
             if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
             if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
             infogroups.push(infogroup[0])
+            console.log(req.body.usergroups)
         }).select(' name tags avatar ')
     }
     res.status(200).send(infogroups)
@@ -140,12 +178,10 @@ function getUsers (req, res) {
 
 const validGroup = function (req) {
     let name = req.body.name
-    let center = req.body.center
     let tags = req.body.tags
     let visibility = req.body.visibility
 
     if (name == null || name === '') return [`Error: group name is empty`, false]
-    else if (center == null || center === '') return [`Error: center is empty`, false]
     else if (tags == null || tags === '' || tags.length === 0) return [`Error: tags is empty`, false]
     else if (visibility == null || visibility === '') return [`Error: visibility is empty`, false]
     else return ['', true]
@@ -160,5 +196,6 @@ module.exports = {
     getGroupwithSearch,
     getGroupName,
     subscribe,
-    getUsers
+    getUsers,
+    unsubscribe
 }
