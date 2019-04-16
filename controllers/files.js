@@ -41,6 +41,7 @@ const addFile = (req, res) => {
             file.type = extension
             file.groupName = req.params.groupName
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
+            file.user = fields.user
 
             if (!fs.existsSync('files/' + req.params.groupName)) {
                 fs.mkdirSync('files/' + req.params.groupName)
