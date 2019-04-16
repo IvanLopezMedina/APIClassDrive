@@ -18,7 +18,10 @@ const createGroup = (req, res) => {
         group.users = [id]
         group.avatar = group.gravatar()
 
-        forumCtrl.createForum(req.body.name, res)
+        let val = forumCtrl.createForum(req.body.name)
+        if (!val[2]) {
+            return res.status(val[1]).send({ msg: val[0] })
+        }
 
         if (group.validatePassword() || 'public'.match(req.body.visibility)) {
             group.save((err) => {

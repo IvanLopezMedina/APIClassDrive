@@ -1,11 +1,16 @@
 const Forum = require('../models/forum')
 
-const createForum = (groupName, res) => {
-    var forum = new Forum.Forum()
-    forum.groupName = groupName
-    forum.save((err) => {
-        if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-    })
+const createForum = (groupName) => {
+    if (groupName == null || groupName === '') {
+        return ['Error, groupName is empty', 400, false]
+    } else {
+        var forum = new Forum.Forum()
+        forum.groupName = groupName
+        forum.save((err) => {
+            if (err) return [`Error creating the forum: ${err} `, 500, false]
+        })
+        return ['', 200, true]
+    }
 }
 
 const getPosts = (req, res) => {
