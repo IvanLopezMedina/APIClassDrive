@@ -57,8 +57,9 @@ const deleteTest = (req, res) => {
 
     Test.Test.findById(testId, (err, test) => {
         if (err) return res.status(409).send({ message: `Error deleting the test: ${err}` })
+        if (!test) return res.status(404).send({ message: `Test not found` })
 
-        Test.deleteOne(test, err => {
+        test.delete(err => {
             if (err) return res.status(409).send({ message: `Error deleting the test: ${err}` })
             res.status(200).send({ message: 'The test has been deleted successfully' })
         })
