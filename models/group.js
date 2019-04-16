@@ -20,7 +20,11 @@ const GroupSchema = Schema({
     //    minlength: 8
     },
     admin: ObjectId,
-    users: [ObjectId],
+    users: {
+        type: [ObjectId],
+        unique: true,
+        dropDups: true
+    },
     avatar: String,
     creationDate: {
         type: Date,
