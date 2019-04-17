@@ -3,11 +3,13 @@ const Group = require('../models/group')
 
 const createGroup = (req, res) => {
     let group = new Group()
+    let id = req.body.user
     group.name = req.body.name
-    group.center = req.body.center
     group.tags = req.body.tags
     group.visibility = req.body.visibility
     if ('private'.match(req.body.visibility)) group.password = req.body.password
+    group.admin = id
+    group.users = [id]
     group.avatar = group.gravatar()
 
     if (group.validatePassword() || 'public'.match(req.body.visibility)) {
@@ -51,6 +53,32 @@ const deleteGroup = (req, res) => {
     })
 }
 
+const searchGroup = (req, res) => {
+    let search = req.body.search
+    Group.find({name: new RegExp('^'+search+'.*$', "i")}, {'_id':0, 'name': 1}, {sort: {name: 1}, limit: 10}, (err, search) => {
+        let groups = []
+        for(var i=0; i<search.length; i++) {
+            groups.push(search[i]['name'])
+        }
+        if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
+        return res.status(200).send(groups)
+        })
+    }
+	  
+const getGroupwithSearch = (req, res) => {
+    let search = req.body.search
+    Group.find({name : new RegExp('^'+search+'.*$', "i")}, {'_id' : 0, 'name' : 1, 'tags' : 1, 'visibility' : 1, 'users': 1}, {sort: {name: 1}, limit: 10}, (err, search) => {
+        let groups = []
+        for(var i=0; i<search.length; i++) {
+            search[i]['users'][0] = search[i]['users'].length
+            groups.push(search[i])      
+        }
+        console.log(groups)
+        if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
+        return res.status(200).send(groups)
+      })
+  }
+	
 async function getGroups(req, res){
 
     let infogroups = []
@@ -87,7 +115,9 @@ module.exports = {
     createGroup,
     deleteGroup,
     getGroup,
-    getGroups
+    getGroups,
+    searchGroup,
+    getGroupwithSearch
 
 }
 

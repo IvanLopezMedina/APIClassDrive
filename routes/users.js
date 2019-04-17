@@ -1,7 +1,7 @@
 const usersCtrl = require('../controllers/users')
 const express = require('express')
-const router = express.Router()
 const auth = require('../middlewares/auth')
+const router = express.Router()
 
 router.get('/users', usersCtrl.getUsers)
 router.get('/users/:userId', usersCtrl.getUser)

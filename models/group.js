@@ -9,7 +9,6 @@ const GroupSchema = Schema({
         type: String,
         required: true,
         unique: true },
-    center: String,
     tags: [],
     visibility: {
         type: String,
@@ -21,7 +20,7 @@ const GroupSchema = Schema({
         select: false,
         minlength: 8
     },
-    admin: { ObjectId },
+    admin: ObjectId ,
     users: [ObjectId],
     avatar: String,
     creationDate: {
@@ -69,3 +68,4 @@ GroupSchema.methods.validatePassword = function () {
 }
 
 module.exports = mongoose.model('Group', GroupSchema)
+
