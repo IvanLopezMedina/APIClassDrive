@@ -14,7 +14,7 @@ app.use(cors())
 app.use('/api', users)
 app.use('/api', groups)
 app.use('/api', forums)
-app.use('/api/files/', files)
+app.use('/api/files', files)
 app.use('/api/tests', test)
 
 module.exports = app
