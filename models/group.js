@@ -5,27 +5,26 @@ const crypto = require('crypto')
 const bcrypt = require('bcrypt-nodejs')
 
 const GroupSchema = Schema({
-    name: { 
-        type: String, 
+    name: {
+        type: String,
         required: true,
         unique: true },
-    center: String,
-    tags: {
-        degree: String,
-        subject: String
-    },
+    tags: [],
     visibility: {
         type: String,
         enum: ['public', 'private'],
         required: true
     },
     password: {
-        type: String,
-        select: false,
-        minlength: 8
+        type: String
+    //    minlength: 8
     },
-    admin: { ObjectId },
-    users: [ObjectId],
+    admin: ObjectId,
+    users: {
+        type: [ObjectId],
+        unique: true,
+        dropDups: true
+    },
     avatar: String,
     creationDate: {
         type: Date,
@@ -72,3 +71,4 @@ GroupSchema.methods.validatePassword = function () {
 }
 
 module.exports = mongoose.model('Group', GroupSchema)
+

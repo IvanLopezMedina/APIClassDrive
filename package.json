@@ -10,10 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "assert": "1.4.1",
     "bcrypt-nodejs": "0.0.3",
     "cors": "2.8.5",
     "crypto": "1.0.1",
     "express": "4.16.4",
+    "formidable": "1.2.1",
+    "fs": "0.0.1-security",
     "jwt-simple": "0.5.5",
     "moment": "2.24.0",
     "mongoose": "5.4.18",
@@ -32,4 +35,3 @@
     "supertest": "4.0.2"
   }
 }
-

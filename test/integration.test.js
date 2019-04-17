@@ -18,24 +18,69 @@ mongoose.connect(config.db, (err, res) => {
     })
 })
 
-describe('API Tests', function () { 
+describe('API Tests', function () {
     describe('# Get all users', function () {
         it('should get all the users', function (done) {
             request(app).get('/api/users').end(function (err, res) {
                 if (err) assert.strictEqual(500, res.statusCode)
                 assert.strictEqual(200, res.statusCode)
-                
                 done()
             })
         })
     })
     var user = { name: 'Ivan', lastname: 'Lopez', email: 'ivancidtofdff@gmail.com', password: 'classdrive', displayname: 'WedffdfffF', country: 'Spain' }
-    describe('## Create User ', function () { 
-        it('should create a user', function (done) { 
-            request(app).post('/api/signup').send(user).end(function (err, res) { 
+    describe('## Create User ', function () {
+        it('should create a user', function (done) {
+            request(app).post('/api/signup').send(user).end(function (err, res) {
                 if (err) assert.strictEqual(500, res.statusCode)
                 assert.strictEqual(200, res.statusCode)
                 assert.strictEqual(res.body.user.name, 'Ivan')
+                done()
+            })
+        })
+    })
+    describe('## Get group by name', function () {
+        it('should find the  group', function (done) {
+            request(app).get('/api/groupsname/olaf').end(function (err, res) {
+                if (err) assert.strictEqual(500, res.statusCode)
+                assert.strictEqual(200, res.statusCode)
+                done()
+            })
+        })
+    })
+    describe('## Create group by name ', function () {
+        it('should send and error, the name doesnt exist', function (done) {
+            request(app).get('/api/groupname/noexisteix').end(function (err, res) {
+                if (err) assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(404, res.statusCode)
+                done()
+            })
+        })
+    })
+    describe('## Subscribe a member ', function () {
+        it('should subscribe ', function (done) {
+            request(app).put('/api/subscribe/5c98b2116c3e6d3eac21142d').end(function (err, res) {
+                if (err) assert.strictEqual(404, res.statusCode)
+                assert.strictEqual(200, res.statusCode)
+                // com es fa per pasarli al id del usuari
+                done()
+            })
+        })
+    })
+    describe('## Subscribe a member ', function () {
+        it('should send an error because the id is invalid', function (done) {
+            request(app).put('/api/subscribe/5c8ce2bb8e0a6e1588d073cf').end(function (err, res) {
+                if (err) assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(404, res.statusCode)
+                done()
+            })
+        })
+    })
+    describe('## Subscribe a member ', function () {
+        it('should send an error because the password is incorrect', function (done) {
+            request(app).put('/api/subscribe/5c8ce2bb8e0a6e1588d073cf').end(function (err, res) {
+                if (err) assert.strictEqual(200, res.statusCode)
+                assert.strictEqual(404, res.statusCode)
                 done()
             })
         })

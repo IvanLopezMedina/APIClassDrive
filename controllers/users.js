@@ -13,7 +13,7 @@ const signUp = (req, res) => {
     user.save(err => {
         try{
             var error = err.toString().split(':')[3].split('_')[0]
-        } catch { 
+        } catch {
             var error = ''
         }
         if (err) return res.status(409).send({ msg: `${error} ya existe. Utilice otro ${error}` })
@@ -59,8 +59,7 @@ const updateUser = (req, res) => {
     let update = req.body
 
     User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
-        if (err) return res.status(409).send({ message: `Error updating product: ${err}` })
-
+        if (err) return res.status(409).send({ message: `Error updating product: ${err}` }) 
         res.status(200).send({ user: userUpdated })
     })
 }

@@ -57,7 +57,6 @@ UserSchema.pre('save', function (next) {
         })
     })
 })
-
 UserSchema.methods.gravatar = function (size) {
     if (!size) {
         size = 200
