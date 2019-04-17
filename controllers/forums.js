@@ -13,15 +13,17 @@ const getPosts = (req, res) => {
 const getPost = (req, res) => {
     let forumId = req.body.forumId
     let postId = req.params.postId
+    let post
     Forum.Forum.findById(forumId, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
         for (var i = 0; i < forum['posts'].length; i++) {
             if (forum['posts'][i]['_id'].toString() === postId) {
-                let post = forum['posts'][i]
+                post = forum['posts'][i]
                 res.status(200).send({ post })
             }
         }
+        if (post == null) return res.status(404).send({ message: `Post doesn't exist` })
     })
 }
 
@@ -43,7 +45,7 @@ const addPost = (req, res) => {
                 forum.answers = req.body.answers
                 forum.answer = req.body.answer
                 forum.save((err) => {
-                    if (err) return res.status(500).send({ msg: `Error creating forum: ${err}` })
+                    if (err) return res.status(500).send({ message: `Error creating post: ${err}` })
                     return res.status(200).send({ forum: forum })
                 })
             }
@@ -93,24 +95,11 @@ const addAnswer = (req, res) => {
 
 const updateForum = (req, res) => {
     let forumId = req.params.forumId
-    Forum.Forum.findById(forumId, (err, forum) => {
+
+    Forum.Forum.updateOne({ _id: forumId }, { $set: { posts: req.body.posts } }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
-        else {
-            forum.posts = req.body.posts
-            forum.title = req.body.title
-            forum.date = req.body.date
-            forum.author = req.body.author
-            forum.likes = req.body.likes
-            forum.dislikes = req.body.dislikes
-            forum.userFavs = req.body.userfavs
-            forum.answers = req.body.answers
-            forum.answer = req.body.answer
-            forum.save((err) => {
-                if (err) return res.status(500).send({ msg: `Error creating forum: ${err}` })
-                return res.status(200).send({ forum: forum })
-            })
-        }
+        else return res.status(200).send({ forum: forum })
     })
 }
 
