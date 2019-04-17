@@ -125,27 +125,17 @@ const subscribe = (req, res) => {
 const unsubscribe = (req, res) => {
     let groupId = req.params.groupId
     let userId = req.body.userId
-    let trobat = false
-    let i = 0
     Group.findById(groupId, (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `Group doesn't exist` })
-        else {
-            console.log('aa')
-            while (!trobat && i < group.users.length) {
-                if (userId === group.users[i]) {
-                    console.log('Ha entrat el bucle')
-                    trobat = true
-                    group.users.splice(i)
-                    return res.status(200).send(group, { message: `User eliminated` })
-                }
-                i++
-                console.log(i)
-                console.log(group.users[i])
-                console.log(userId)
-            }
-            return res.status(200).send(group)
-        }
+        let groupcontainsuser = (group.users.indexOf(userId) > -1)
+        if (groupcontainsuser) {
+            group.users.pull({ _id: userId })
+            group.save(function (err) {
+                if (err) return res.status(409).send({ message: `Error subscribing: ${err}` })
+                return res.status(200).send({ message: `User eliminated` })
+            })
+        } else return res.status(409).send({ message: `User not in the group` })
     })
 }
 
