@@ -10,8 +10,25 @@ const getPosts = (req, res) => {
     })
 }
 
+const getPost = (req, res) => {
+    let forumId = req.body.forumId
+    let postId = req.params.postId
+    let post
+    Forum.Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
+        for (var i = 0; i < forum['posts'].length; i++) {
+            if (forum['posts'][i]['_id'].toString() === postId) {
+                post = forum['posts'][i]
+                res.status(200).send({ post })
+            }
+        }
+        if (post == null) return res.status(404).send({ message: `Post doesn't exist` })
+    })
+}
+
 const addPost = (req, res) => {
-    var valid = validPost(req, res)
+    var valid = validPost(req)
     if (valid[1]) {
         let forumId = req.params.forumId
         Forum.Forum.findById(forumId, (err, forum) => {
@@ -28,7 +45,7 @@ const addPost = (req, res) => {
                 forum.answers = req.body.answers
                 forum.answer = req.body.answer
                 forum.save((err) => {
-                    if (err) return res.status(500).send({ msg: `Error creating forum: ${err}` })
+                    if (err) return res.status(500).send({ message: `Error creating post: ${err}` })
                     return res.status(200).send({ forum: forum })
                 })
             }
@@ -64,8 +81,6 @@ const addAnswer = (req, res) => {
                         answer.date = req.body.answers[j]['date']
                         answer.likes = req.body.answers[j]['likes']
                         answer.dislikes = req.body.answers[j]['dislikes']
-                        console.log(req.body.answers[j]['answer'])
-                        console.log(forum['posts'][i])
                         forum['posts'][i]['answers'].push(answer)
                     }
                 }
@@ -78,7 +93,17 @@ const addAnswer = (req, res) => {
     })
 }
 
-const validPost = function (req, res) {
+const updateForum = (req, res) => {
+    let forumId = req.params.forumId
+
+    Forum.Forum.updateOne({ _id: forumId }, { $set: { posts: req.body.posts } }, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
+        else return res.status(200).send({ forum: forum })
+    })
+}
+
+const validPost = function (req) {
     let posts = req.body.posts
     if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
     for (var i = 0; i < posts.length; i++) {
@@ -90,8 +115,48 @@ const validPost = function (req, res) {
 
     return ['', true]
 }
+
+const deleteForumElement = function (req, res) {
+    /*
+     REQUIRED FIELDS ON REQUEST BODY:
+        idToDelete: Id of the forum element you want to delete
+     */
+    let forumId = req.params.forumId
+    let elementToDelete = req.body.idToDelete
+    // Se if element is a post or an answer
+    Forum.Forum.findById(forumId, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
+        else {
+            for (var i = 0; i < forum['posts'].length; i++) {
+                if (forum['posts'][i]['_id'].toString() === elementToDelete) {
+                    forum['posts'].splice(i, 1)
+                    forum.save((err) => {
+                        if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                        return res.status(200).send({ message: 'Post Deleted successfully' })
+                    })
+                } else {
+                    for (var j = 0; j < forum['posts'][i]['answers'].length; j++) {
+                        if (forum['posts'][i]['answers'][j]['_id'].toString() === elementToDelete) {
+                            forum['posts'][i]['answers'].splice(j, 1)
+                            forum.save((err) => {
+                                if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                                return res.status(200).send({ message: 'Answer Deleted successfully' })
+                            })
+                        }
+                    }
+                }
+            }
+            return res.status(500)
+        }
+    })
+}
+
 module.exports = {
     getPosts,
+    getPost,
     addPost,
-    addAnswer
+    updateForum,
+    addAnswer,
+    deleteForumElement
 }
