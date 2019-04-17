@@ -71,3 +71,4 @@ GroupSchema.methods.validatePassword = function () {
 }
 
 module.exports = mongoose.model('Group', GroupSchema)
+
