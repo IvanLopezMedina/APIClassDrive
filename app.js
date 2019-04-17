@@ -13,6 +13,6 @@ app.use(cors())
 app.use('/api', users)
 app.use('/api', groups)
 app.use('/api', forums)
-app.use('/api', files)
+app.use('/api/files/', files)
 
 module.exports = app

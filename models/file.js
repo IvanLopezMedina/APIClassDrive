@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const ObjectId = mongoose.Schema.Types.ObjectId
 
 const FileSchema = new Schema({
     name: {
@@ -21,7 +22,11 @@ const FileSchema = new Schema({
         default: Date.now()
     },
     user: {
-        type:String,
+        type: String,
+        required: true
+    },
+    userId: {
+        type: ObjectId,
         required: true
     }
 },

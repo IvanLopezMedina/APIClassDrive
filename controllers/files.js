@@ -1,4 +1,5 @@
 const File = require('../models/file')
+const Group = require('../models/group')
 const formidable = require('formidable')
 const fs = require('fs')
 
@@ -63,14 +64,24 @@ const addFile = (req, res) => {
 }
 
 const deleteFile = (req, res) => {
-    let fileId = req.params.fileId
+    let fileId = req.body.fileId
+    let owner = req.body.userId
 
-    File.findById(fileId, (err, file) => {
-        if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
-
-        File.deleteOne(file, err => {
+    Group.find({ name: req.params.groupName }, (err, group) => {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        if (!group) return res.status(404).send({ message: `No files: ${err}` })
+        File.findById(fileId, (err, file) => {
             if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
-            res.status(200).send({ message: 'The file has been deleted successfully' })
+            if (!file) return res.status(404).send({ message: `File not found` })
+            if (owner.match(file.userId) || owner.match(group[0].admin)) {
+                File.deleteOne(file, err => {
+                    if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
+                    fs.unlink(file.path, function (err) {
+                        if (err) return res.status(409).send({ message: `Error deleting the file: ${err}` })
+                        res.status(200).send({ message: 'The file has been deleted successfully' })
+                    })
+                })
+            } else return res.status(403).send({ message: `Forbidden. The file is not yours. Contact the group admin` })
         })
     })
 }
