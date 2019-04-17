@@ -76,7 +76,7 @@ const searchGroup = (req, res) => {
 }
 const getGroupwithSearch = (req, res) => {
     let search = req.body.search
-    Group.find({ name: new RegExp('^' + search + '.*$', 'i') }, { '_id': 0, 'name': 1, 'tags': 1, 'visibility': 1, 'users': 1 }, { sort: { name: 1 }, limit: 10 }, (err, search) => {
+    Group.find({ name: new RegExp('^' + search + '.*$', 'i') }, { '_id': 1, 'name': 1, 'tags': 1, 'visibility': 1, 'users': 1 }, { sort: { name: 1 }, limit: 10 }, (err, search) => {
         let groups = []
         for (var i = 0; i < search.length; i++) {
             search[i]['users'][0] = search[i]['users'].length
@@ -93,7 +93,7 @@ const subscribe = (req, res) => {
     let password = req.body.password
     let groupName = req.body.groupName
     let valid = false
-
+    console.log(groupId)
     Group.findById(groupId, async (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `Group doesn't exist` })
