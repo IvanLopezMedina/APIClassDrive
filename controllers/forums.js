@@ -179,8 +179,7 @@ module.exports = {
     addPost,
     addAnswer,
     createForum,
-    deleteForum
+    deleteForum,
     updateForum,
-    addAnswer,
     deleteForumElement
 }
