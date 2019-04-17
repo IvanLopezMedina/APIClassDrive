@@ -6,6 +6,6 @@ const router = express.Router()
 router.get('getfiles/:groupName', filesCtrl.getFiles)
 router.get('getfile', filesCtrl.getFile)
 router.post('addFile/:groupName', filesCtrl.addFile)
-router.post('deleteFile/:groupName', filesCtrl.deleteFile)
+router.put('deleteFile/:groupName', filesCtrl.deleteFile)
 
 module.exports = router
