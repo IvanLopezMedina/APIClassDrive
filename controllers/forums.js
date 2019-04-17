@@ -69,7 +69,7 @@ const addAnswer = (req, res) => {
     let postId = req.body.postId
 
     Forum.Forum.findById(forumId, (err, forum) => {
-        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
         else {
             for (var i = 0; i < forum['posts'].length; i++) {
@@ -86,7 +86,7 @@ const addAnswer = (req, res) => {
                 }
             }
             forum.save((err) => {
-                if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                if (err) return res.status(500).send({ msg: `Error creating answer: ${err}` })
                 return res.status(200).send({ forum: forum })
             })
         }
@@ -96,8 +96,8 @@ const addAnswer = (req, res) => {
 const updateForum = (req, res) => {
     let forumId = req.params.forumId
 
-    Forum.Forum.updateOne({ _id: forumId }, { $set: { posts: req.body.posts } }, (err, forum) => {
-        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+    Forum.Forum.updateOne({ _id: forumId }, { $set: { groupName: req.body.groupName, posts: req.body.posts } }, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
         else return res.status(200).send({ forum: forum })
     })
@@ -125,14 +125,14 @@ const deleteForumElement = function (req, res) {
     let elementToDelete = req.body.idToDelete
     // Se if element is a post or an answer
     Forum.Forum.findById(forumId, (err, forum) => {
-        if (err) return res.status(500).send({ message: `Could not find forum: ${err}` })
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
         else {
             for (var i = 0; i < forum['posts'].length; i++) {
                 if (forum['posts'][i]['_id'].toString() === elementToDelete) {
                     forum['posts'].splice(i, 1)
                     forum.save((err) => {
-                        if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                        if (err) return res.status(500).send({ message: `Error deleting post: ${err}` })
                         return res.status(200).send({ message: 'Post Deleted successfully' })
                     })
                 } else {
@@ -140,7 +140,7 @@ const deleteForumElement = function (req, res) {
                         if (forum['posts'][i]['answers'][j]['_id'].toString() === elementToDelete) {
                             forum['posts'][i]['answers'].splice(j, 1)
                             forum.save((err) => {
-                                if (err) return res.status(500).send({ msg: `Error al crear forum: ${err}` })
+                                if (err) return res.status(500).send({ message: `Error deleting answer: ${err}` })
                                 return res.status(200).send({ message: 'Answer Deleted successfully' })
                             })
                         }
