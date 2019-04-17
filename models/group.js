@@ -16,12 +16,15 @@ const GroupSchema = Schema({
         required: true
     },
     password: {
-        type: String,
-        select: false,
-        minlength: 8
+        type: String
+    //    minlength: 8
     },
-    admin: ObjectId ,
-    users: [ObjectId],
+    admin: ObjectId,
+    users: {
+        type: [ObjectId],
+        unique: true,
+        dropDups: true
+    },
     avatar: String,
     creationDate: {
         type: Date,

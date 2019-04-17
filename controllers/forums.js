@@ -1,5 +1,18 @@
 const Forum = require('../models/forum')
 
+const createForum = (groupName) => {
+    if (groupName == null || groupName === '') {
+        return ['Error, groupName is empty', 400, false]
+    } else {
+        var forum = new Forum.Forum()
+        forum.groupName = groupName
+        forum.save((err) => {
+            if (err) return [`Error creating the forum: ${err} `, 500, false]
+        })
+        return ['', 200, true]
+    }
+}
+
 const getPosts = (req, res) => {
     let forumId = req.params.forumId
     Forum.Forum.findById(forumId, (err, forum) => {
@@ -93,6 +106,14 @@ const addAnswer = (req, res) => {
     })
 }
 
+
+const deleteForum = function (name) {
+    Forum.Forum.findOneAndRemove({ groupName: name }, (err, forum) => {
+        if (err) return { message: `Error deleting the forum: ${err}` }
+        return { message: 'The forum has been deleted successfully' }
+    })
+}
+
 const updateForum = (req, res) => {
     let forumId = req.params.forumId
 
@@ -156,6 +177,9 @@ module.exports = {
     getPosts,
     getPost,
     addPost,
+    addAnswer,
+    createForum,
+    deleteForum
     updateForum,
     addAnswer,
     deleteForumElement
