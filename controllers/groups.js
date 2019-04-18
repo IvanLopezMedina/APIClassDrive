@@ -1,29 +1,65 @@
 const Group = require('../models/group')
 const User = require('../models/user')
 const forumCtrl = require('./forums')
+const Search = require('../models/search')
 // const { check, validationResult } = require('express-validator');
 
-const createGroup = (req, res) => {
+const createGroup = async function (req, res){
+
     let valid = validGroup(req)
     if (valid[1]) {
         let group = new Group()
+        let search = new Search()
+        let arrayTags = []
         let id = req.body.user
-        group.name = req.body.name
-        group.visibility = req.body.visibility
+        let groupName = req.body.name
+        group.name = groupName
         group.tags = req.body.tags
-        // if ('private'.match(req.body.visibility) || 'closed'.match(req.body.visibility)) group.password = req.body.password
+
+        group.visibility = req.body.visibility
         if ('private'.match(req.body.visibility)) group.password = req.body.password
-        // if ('public'.match(req.body.visibility) || 'private'.match(req.body.visibility)) group.tags = req.body.tags
         group.admin = id
         group.users = [id]
         group.avatar = group.gravatar()
 
+        //Add Group to Collection Forum
         let val = forumCtrl.createForum(req.body.name)
         if (!val[2]) {
             return res.status(val[1]).send({ msg: val[0] })
         }
 
+        //Add values to Collection Search 
+        await Search.countDocuments({ name: req.body.name }, function (err, count) {
+            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+            if(count === 0) { //new name
+                search.name = req.body.name.toLowerCase()
+                search.type = "name"
+                search.nSearches = 0
+                search.save((err) => {
+                    if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+                    })
+                }
+            })   
+        for(let i=0; i<req.body.tags.length; i++) {
+            await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
+                if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                if(count === 0) { //new tag
+                    arrayTags.push({ name : req.body.tags[i].toLowerCase(), type : "tags", nSearches : 0 })
+                }
+            }) 
+        }
+        if(arrayTags.length !== 0) {
+                search.collection.insertMany(arrayTags, function (err) {
+                if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+                }) 
+            }
         if (group.validatePassword() || 'public'.match(req.body.visibility)) {
+        //Add Group to Collection Users
+            User.updateOne({ _id: id, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
+                if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
+                if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
+            })
+        //Add Group to Collection Groups
             group.save((err) => {
                 if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
                 return res.status(200).send({ group: group })
@@ -33,9 +69,9 @@ const createGroup = (req, res) => {
         return res.status(500).send({ message: valid[0] })
     }
 }
+
 const getGroup = (req, res) => {
     let groupId = req.params.groupId
-
     Group.findById(groupId, (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `The group doesn't exist: ${err}` })
@@ -65,27 +101,66 @@ const deleteGroup = (req, res) => {
 
 const searchGroup = (req, res) => {
     let search = req.body.search
-    Group.find({ name: new RegExp('^' + search + '.*$', 'i') }, { '_id': 0, 'name': 1 }, { sort: { name: 1 }, limit: 10 }, (err, search) => {
+    let searchSplitted = search.split(" ")
+    let lastElementSearch = searchSplitted[searchSplitted.length-1]
+
+    Search.find({name: new RegExp('^'+lastElementSearch+'.*$', "i")}, {'_id':0, 'name': 1}, {sort: {nSearches: -1}, limit: 10}, (err, search) => {
         let groups = []
-        for (var i = 0; i < search.length; i++) {
-            groups.push(search[i]['name'])
+        for(let i=0; i<search.length; i++) {
+            
+            if(searchSplitted[0] !== search[i]['name']) {
+                searchSplitted[searchSplitted.length-1] = search[i]['name'] 
+                groups.push(searchSplitted.join(" "))
+            }
         }
         if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
         return res.status(200).send(groups)
-    })
-}
-const getGroupwithSearch = (req, res) => {
+        })
+    }
+
+const getGroupwithSearch = async function (req, res) {
     let search = req.body.search
-    Group.find({ name: new RegExp('^' + search + '.*$', 'i') }, { '_id': 1, 'name': 1, 'tags': 1, 'visibility': 1, 'users': 1 }, { sort: { name: 1 }, limit: 10 }, (err, search) => {
-        let groups = []
-        for (var i = 0; i < search.length; i++) {
-            search[i]['users'][0] = search[i]['users'].length
-            groups.push(search[i])
+    let searchSplitted = search.split(' ')
+    let searchMap = new Map()
+    
+    for(let i=0; i<searchSplitted.length; i++) {
+        
+        Group.find({$or : [{name : new RegExp('^'+searchSplitted[i]+'.*$', "i")}, {tags : new RegExp('^'+searchSplitted[i]+'.*$', "i")}]}, {'_id' : 0, 'name' : 1}, {limit: 50}, (err, search) => { //eliminar el limit 10
+            for(var j=0; j<search.length; j++) {
+                if(searchMap.has(search[j].name)) {
+                    searchMap.set(search[j].name, searchMap.get(search[j].name) + 1)
+                }
+                else {
+                    searchMap.set(search[j].name, 1)
+                }
+            }
+            if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
+        })
+        
+        await Search.find({name : searchSplitted[i]}, {'_id' : 0, 'name' : 1, 'nSearches' : 1}, (err, search) => {
+            if(search.length !== 0) {
+                for(let j=0; j<search.length; j++) { //possibility of a same tag and name
+                Search.updateOne({name : search[j]['name'] }, {nSearches : search[j]['nSearches'] + 1}, (err) =>{
+                    if (err) return res.status(409).send({ message: `Error updating nSearches: ${err}` })
+                    })
+                }
+            } 
+            if (err) return res.status(409).send({ message: `Error searching groups: ${err}` })
+        }) 
+    }
+
+    const mapSorted = new Map([...searchMap.entries()].sort((a, b) => b[1] - a[1]));
+    let infogroups = []
+    for(let item of mapSorted) {
+        await Group.find({name : item[0]}, {'_id' : 1, 'name' : 1, 'tags' : 1, 'visibility' : 1, 'users': 1}, (err, search) => {
+        for(var i=0; i<search.length; i++) {
+            search[i]['users'][0] = search[i]['users'].length     
         }
-        console.log(groups)
+        infogroups.push(search[0]) 
         if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
-        return res.status(200).send(groups)
-    })
+        })
+    }   
+    return res.status(200).send(infogroups)
 }
 const subscribe = (req, res) => {
     let groupId = req.body.groupId
@@ -93,7 +168,6 @@ const subscribe = (req, res) => {
     let password = req.body.password
     let groupName = req.body.groupName
     let valid = false
-    console.log(groupId)
     Group.findById(groupId, async (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ message: `Group doesn't exist` })
@@ -139,19 +213,21 @@ const unsubscribe = (req, res) => {
     })
 }
 
-// function for menu
-async function getGroups (req, res) {
-    let infogroups = []
-    let groups = req.body.usergroups
-    for (let i = 0; i < groups.length; i++) {
-        await Group.find({ name: groups[i] }, function (err, infogroup) {
-            if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-            if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
-            infogroups.push(infogroup[0])
-            console.log(req.body.usergroups)
-        }).select(' name tags avatar ')
-    }
-    res.status(200).send(infogroups)
+const getGroups = (req, res) => {
+    let userId = req.body.userId
+    User.findById(userId, {_id:0, groups:1}, async function (err, groups) {
+        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+        let infogroups = []
+        let groupArray = groups.groups
+        for (let i = 0; i < groupArray.length; i++) {
+            await Group.find({ name: groupArray[i] }, function (err, infogroup) {
+                if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+                if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
+                infogroups.push(infogroup[0])
+            }).select(' name tags avatar ')
+        }
+        res.status(200).send(infogroups)
+    })    
 }
 
 function getUsers (req, res) {
