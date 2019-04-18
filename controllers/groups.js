@@ -256,6 +256,17 @@ const validGroup = function (req) {
     else return ['', true]
 }
 
+const isAdmin = (req, res) => {
+    let message = `Not Admin`
+    Group.countDocuments({ name: req.params.groupName, admin: req.body.userId }, function (err, count) {
+    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        if(count === 1) { //is Admin
+            message = `Admin`
+        }
+        return res.status(200).send({ message })
+    })
+}
+
 module.exports = {
     createGroup,
     deleteGroup,
@@ -266,6 +277,7 @@ module.exports = {
     getGroupName,
     subscribe,
     getUsers,
-    unsubscribe
+    unsubscribe,
+    isAdmin
 }
 
