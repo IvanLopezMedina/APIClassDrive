@@ -4,7 +4,7 @@ const router = express.Router()
 // const auth = require('../middlewares/auth')
 
 router.get('/getfiles/:groupName', filesCtrl.getFiles)
-router.get('/getfile', filesCtrl.getFile)
+router.get('/getfile/:fileId', filesCtrl.getFile)
 router.post('/addFile/:groupName', filesCtrl.addFile)
 router.put('/deleteFile/:groupName', filesCtrl.deleteFile)
 

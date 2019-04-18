@@ -12,7 +12,7 @@ const getFiles = (req, res) => {
 }
 
 const getFile = (req, res) => {
-    let fileId = req.body.id
+    let fileId = req.params.fileId
     File.findById(fileId, (err, file) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!file) return res.status(404).send({ message: `The file doesn't exist: ${err}` })

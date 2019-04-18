@@ -23,6 +23,8 @@ const postSchema = new Schema({
 const ForumSchema = new Schema({
     groupName: String,
     posts: [postSchema]
+    },
+{ versionKey: false
 })
 
 const Forum = mongoose.model('forum', ForumSchema)
