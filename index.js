@@ -23,8 +23,7 @@ mongoose.connect(config.db, (err, res) => {
 
 
 io.on('connection', socket => {
-    console.log("Socket connected: " + socket.id)    
-    
+    //console.log("Socket connected: " + socket.id)    
     socket.on('initConn', groupname => {
         socket.join(groupname)
     })

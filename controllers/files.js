@@ -8,7 +8,7 @@ const getFiles = (req, res) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!files) return res.status(404).send({ message: `No files: ${err}` })
         return res.status(200).send({ files })
-    }).select('_id, name type')
+    }).select('_id, name type user uploadDate')
 }
 
 const getFile = (req, res) => {
@@ -44,6 +44,7 @@ const addFile = (req, res) => {
             file.groupName = req.params.groupName
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
             file.user = fields.user
+            console.log(fields.user)
 
             if (!fs.existsSync('files/' + req.params.groupName)) {
                 fs.mkdirSync('files/' + req.params.groupName)
