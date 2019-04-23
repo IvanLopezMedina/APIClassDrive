@@ -27,24 +27,21 @@ const getFile = (req, res) => {
 
 const addFile = (req, res) => {
     let file = new File()
-    let error = ''
     let invalid = true
     try {
-        var form = new formidable.IncomingForm()
+        let form = new formidable.IncomingForm()
         form.parse(req, function (err, fields) {
             if (err) return res.status(409).send({ msg: `Error uploading the file: ${err}` })
-            var extension = fields.file.split(',')[0].split('/')[1].split(';')[0]
-            var data = fields.file.split(',')[1]
+            let extension = fields.file.split(',')[0].split('/')[1].split(';')[0]
+            let data = fields.file.split(',')[1]
 
             if (req.params.groupName !== null || fields.file !== null || fields.name !== null) invalid = false
-            else error = 'Invalid group'
             file.name = fields.name
             file.userId = fields.userId
             file.type = extension
             file.groupName = req.params.groupName
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
             file.user = fields.user
-            console.log(fields.user)
 
             if (!fs.existsSync('files/' + req.params.groupName)) {
                 fs.mkdirSync('files/' + req.params.groupName)
@@ -61,7 +58,7 @@ const addFile = (req, res) => {
             })
         })
     } catch (e) {
-        error = 'No file/group provided'
+        console.log(e)
     }
 }
 
