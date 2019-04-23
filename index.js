@@ -30,11 +30,8 @@ io.on('connection', socket => {
     socket.on('finishConn', groupname => {
         socket.leave(groupname)
     })
-    socket.on('message', (body, displayname, groupname) => {
-        socket.to(groupname).broadcast.emit('message', {
-        body,
-        from: displayname
-        })
+    socket.on('message', (message, groupname) => {
+        socket.to(groupname).broadcast.emit('message', message)
     }) 
     socket.on('typing', (displayname, groupname) => {
         socket.to(groupname).broadcast.emit('typing', {

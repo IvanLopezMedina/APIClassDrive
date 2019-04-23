@@ -1,6 +1,7 @@
 const Group = require('../models/group')
 const User = require('../models/user')
 const forumCtrl = require('./forums')
+const chatCtrl = require('./chat')
 const Search = require('../models/search')
 // const { check, validationResult } = require('express-validator');
 
@@ -24,6 +25,12 @@ const createGroup = async function (req, res){
 
         //Add Group to Collection Forum
         let val = forumCtrl.createForum(req.body.name)
+        if (!val[2]) {
+            return res.status(val[1]).send({ msg: val[0] })
+        }
+
+        //Add Group to Collection Chat
+        val = chatCtrl.createChat(req.body.name)
         if (!val[2]) {
             return res.status(val[1]).send({ msg: val[0] })
         }
