@@ -4,26 +4,26 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 
 const answerSchema = new Schema({
     author: String,
-    date: { type: Date, default: Date.now() },
+    date: String,
     answer: String,
     likes: { type: Number, default: 0 },
-    dislikes: { type: Number, default: 0 }
+    dislikes: { type: Number, default: 0 },
+    idMessage: ObjectId
 })
 
 const postSchema = new Schema({
-    title: String,
-    date: { type: Date, default: Date.now() },
+    content: String,
+    date: String,
     author: String,
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-    userFavs: [ObjectId],
     answers: [answerSchema]
 })
 
 const ForumSchema = new Schema({
     groupName: String,
     posts: [postSchema]
-    },
+},
 { versionKey: false
 })
 
