@@ -40,11 +40,10 @@ const addMessage = (req, res) => {
                 let replyMessageId = ""
                 let reply = new Chat.Reply()
                 if(!req.body.replies[0].messageId) {
-                    await Chat.Chat.findOne({groupName: req.params.groupName, 'messages.date': req.body.replies[0].date, 'messages.content': req.body.replies[0].reply}, {_id: 0, 'messages._id':1}, (err, messageId) => {
+                    await Chat.Message.findOne({date: req.body.replies[0].date, author: req.body.replies[0].author, content: req.body.replies[0].reply}, {_id:1}, (err, messageId) => {
                         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
                         if (!messageId) return res.status(404).send({ message: `Message doesn't exist` })
-                        //PROBLEMA 1 
-                        replyMessageId = messageId
+                        replyMessageId = messageId._id
                     })
                     reply.idMessage = replyMessageId
                 }
@@ -54,16 +53,22 @@ const addMessage = (req, res) => {
                 reply.date = req.body.replies[0].date
                 reply.author = req.body.replies[0].author
                 reply.reply = req.body.replies[0].reply
+                reply.save((err) => {
+                    if (err) return res.status(500).send({ message: `Error saving the reply: ${err}` })
+                })
                 message.replies.push(reply)
                 //Add Question to Answer
                 Forum.addAnswer(req, function(correctAdded) {
                     if(!correctAdded[1]) {
                         return res.status(404).send({ message: correctAdded[0] })
                     }
-               })
+               }) 
             }
             chat.messages.push(message)
             //Add message 
+            message.save((err) => {
+                if (err) return res.status(500).send({ message: `Error saving the question: ${err}` })
+            })
             chat.save((err) => {
                 if (err) return res.status(500).send({ message: `Error saving the message: ${err}` })
                 return res.status(200).send({ message: `Message received` })
