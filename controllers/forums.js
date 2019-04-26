@@ -1,4 +1,6 @@
 const Forum = require('../models/forum')
+const mongoose = require('mongoose')
+
 
 const createForum = (groupName) => {
     if (groupName == null || groupName === '') {
@@ -50,7 +52,8 @@ const addAnswer = (req, cb) => {
             date : req.body.date,
             author : req.body.author,
             likes : req.body.likes,
-            dislikes : req.body.dislikes
+            dislikes : req.body.dislikes,
+            answerId: mongoose.Types.ObjectId()
             }
             Forum.Answer.findOneAndUpdate({idQuestion : questionId.posts[0]._id}, {$push:{answers: answers}}, (err, updated) => {
                 if (err) return cb([`Error retrieving data: ${err}`, false])
