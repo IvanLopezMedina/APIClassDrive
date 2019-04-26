@@ -1,4 +1,5 @@
 const Forum = require('../models/forum')
+const mongoose = require('mongoose')
 
 const createForum = (groupName) => {
     if (groupName == null || groupName === '') {
@@ -13,9 +14,82 @@ const createForum = (groupName) => {
     }
 }
 
+const addPost = (req, cb) => {
+    var valid = validPost(req)
+    if (valid[1]) {
+        let groupName = req.params.groupName
+        Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
+            if (err) cb([`Error retrieving data: ${err}`, false])
+            if (!forum) cb([`Forum doesn't exist`, false])
+            else {
+                let post = new Forum.Post()
+                post.content = req.body.content
+                post.date = req.body.date
+                post.author = req.body.author
+                post.likes = req.body.likes
+                post.dislikes = req.body.dislikes
+                forum.posts.push(post)
+                forum.save((err) => {
+                    if (err) cb([`Error creating post: ${err}`, false])
+                    cb(["", true])
+                })
+            }
+        })
+    } else {
+        cb([valid[0], false])
+    }
+}
+
+const addAnswer = (req, cb) => {
+    console.log('holi')
+    Forum.Forum.findOne({ groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }, { _id: 0, 'posts.$': 1 }, (err, questionId) => {
+        if (err) return cb([`Error retrieving data: ${err}`, false])
+        if (questionId) {
+            let answers = {
+                answer: req.body.content,
+                date: req.body.date,
+                author: req.body.author,
+                likes: req.body.likes,
+                dislikes: req.body.dislikes,
+                answerId: mongoose.Types.ObjectId()
+            }
+            Forum.Answer.findOneAndUpdate({ idQuestion: questionId.posts[0]._id }, { $push:{ answers: answers } }, (err, updated) => {
+                if (err) return cb([`Error retrieving data: ${err}`, false])
+                if (!updated) {
+                    let answer = new Forum.Answer()
+                    answer.idQuestion = questionId.posts[0]._id
+                    answer.answers.push(answers)
+                    answer.save((err) => {
+                        if (err) return [`Error creating the answer: ${err} `, 500, false]
+                    })
+                    return ['', 200, true]
+                }
+            })
+        }
+    })
+}
+
+const addAnswerResp = (req, res) => { // Funcion para añadir respuestas a una pregunta desde Forum en vez de Chat (ruta sigue siendo la misma)
+    addAnswer(req, function (correctAdded) {
+        if (!correctAdded[1]) {
+            return res.status(404).send({ message: correctAdded[0] })
+        }
+        return res.status(200).send({ message: 'Answer created successfully' })
+    })
+}
+
+const validPost = function (req) {
+    let content = req.body.content
+    let author = req.body.author
+    if (content == null || content === '') return [`Error content is empty`, false]
+    else if (author == null || author === '') return [`Error author is empty`, false]
+    return ['', true]
+}
+
+//////////////////////////////////////////ESTAS FUNCIONES SE TIENEN QUE REVISAR (ABAJO) --> ////////////////////////////////////////////////////////
 const getPosts = (req, res) => {
-    let forumId = req.params.forumId
-    Forum.Forum.findById(forumId, (err, forum) => {
+    let groupName = req.params.groupName
+    Forum.Forum.findOne(groupName, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
         var posts = forum[ 'posts' ]
@@ -24,10 +98,10 @@ const getPosts = (req, res) => {
 }
 
 const getPost = (req, res) => {
-    let forumId = req.body.forumId
+    let groupName = req.body.groupName
     let postId = req.params.postId
     let post
-    Forum.Forum.findById(forumId, (err, forum) => {
+    Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
         for (var i = 0; i < forum['posts'].length; i++) {
@@ -38,74 +112,7 @@ const getPost = (req, res) => {
         }
         if (post == null) return res.status(404).send({ message: `Post doesn't exist` })
     })
-}
-
-const addPost = (req, res) => {
-    var valid = validPost(req)
-    if (valid[1]) {
-        let forumId = req.params.forumId
-        Forum.Forum.findById(forumId, (err, forum) => {
-            if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
-            if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
-            else {
-                forum.posts = forum['posts'].concat(req.body.posts)
-                forum.title = req.body.title
-                forum.date = req.body.date
-                forum.author = req.body.author
-                forum.likes = req.body.likes
-                forum.dislikes = req.body.dislikes
-                forum.userFavs = req.body.userfavs
-                forum.answers = req.body.answers
-                forum.answer = req.body.answer
-                forum.save((err) => {
-                    if (err) return res.status(500).send({ message: `Error creating post: ${err}` })
-                    return res.status(200).send({ forum: forum })
-                })
-            }
-        })
-    } else {
-        return res.status(500).send({ message: valid[0] })
-    }
-}
-
-const addAnswer = (req, res) => {
-    /* REQUIRED FIELDS ON REQUEST BODY
-     *  postId: Post in which the answer is inserted
-     *  answer: The content of the answer
-     *  author: The answer's author
-     *  date: date published
-     *  likes: likes the answer has
-     *  dislikes: dislikes the answer has
-     * */
-
-    let forumId = req.params.forumId
-    let postId = req.body.postId
-
-    Forum.Forum.findById(forumId, (err, forum) => {
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
-        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
-        else {
-            for (var i = 0; i < forum['posts'].length; i++) {
-                if (forum['posts'][i]['_id'].toString() === postId) {
-                    for (var j = 0; j < req.body.answers.length; j++) {
-                        let answer = new Forum.Answer()
-                        answer.answer = req.body.answers[j]['answer']
-                        answer.author = req.body.answers[j]['author']
-                        answer.date = req.body.answers[j]['date']
-                        answer.likes = req.body.answers[j]['likes']
-                        answer.dislikes = req.body.answers[j]['dislikes']
-                        forum['posts'][i]['answers'].push(answer)
-                    }
-                }
-            }
-            forum.save((err) => {
-                if (err) return res.status(500).send({ msg: `Error creating answer: ${err}` })
-                return res.status(200).send({ forum: forum })
-            })
-        }
-    })
-}
-
+} 
 
 const deleteForum = function (name) {
     Forum.Forum.findOneAndRemove({ groupName: name }, (err, forum) => {
@@ -115,69 +122,53 @@ const deleteForum = function (name) {
 }
 
 const updateForum = (req, res) => {
-    let forumId = req.params.forumId
+    let groupName = req.params.groupName
 
-    Forum.Forum.updateOne({ _id: forumId }, { $set: { groupName: req.body.groupName, posts: req.body.posts } }, (err, forum) => { 
+    Forum.Forum.updateOne({ groupName: groupName }, { $set: { groupName: req.body.groupName, posts: req.body.posts } }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
         else return res.status(200).send({ forum: forum })
     })
 }
 
-const validPost = function (req) {
-    let posts = req.body.posts
-    if (posts == null || posts === '' || posts.length === 0) return [`Error post is empty`, false]
-    for (var i = 0; i < posts.length; i++) {
-        let title = posts[i]['title']
-        let author = posts[i]['author']
-        if (title == null || title === '') return [`Error title is empty`, false]
-        else if (author == null || author === '') return [`Error author is empty`, false]
-    }
-
-    return ['', true]
+const deleteForumElement = function (req, res) {
+    let groupName = req.params.groupName
+    let elementToDelete = req.body.idToDelete
+    // Se if element is a post or an answer
+    Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
+        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
+        if (!forum) return res.status(404).send({ message: `Forum does not exist` })
+        else {
+            for (var i = 0; i < forum['posts'].length; i++) {
+                if (forum['posts'][i]['_id'].toString() === elementToDelete) {
+                    forum['posts'].splice(i, 1)
+                    forum.save((err) => {
+                        if (err) return res.status(500).send({ message: `Error deleting post: ${err}` })
+                        return res.status(200).send({ message: 'Post Deleted successfully' })
+                    })
+                } else {
+                    for (var j = 0; j < forum['posts'][i]['answers'].length; j++) {
+                        if (forum['posts'][i]['answers'][j]['_id'].toString() === elementToDelete) {
+                            forum['posts'][i]['answers'].splice(j, 1)
+                            forum.save((err) => {
+                                if (err) return res.status(500).send({ message: `Error deleting answer: ${err}` })
+                                return res.status(200).send({ message: 'Answer Deleted successfully' })
+                            })
+                        }
+                    }
+                }
+            }
+            return res.status(500)
+        }
+    })
 }
-
-const deleteForumElement = function (req, res) { 
-    /* 
-     REQUIRED FIELDS ON REQUEST BODY: 
-        idToDelete: Id of the forum element you want to delete 
-     */ 
-    let forumId = req.params.forumId 
-    let elementToDelete = req.body.idToDelete 
-    // Se if element is a post or an answer 
-    Forum.Forum.findById(forumId, (err, forum) => { 
-        if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` }) 
-        if (!forum) return res.status(404).send({ message: `Forum does not exist` }) 
-        else { 
-            for (var i = 0; i < forum['posts'].length; i++) { 
-                if (forum['posts'][i]['_id'].toString() === elementToDelete) { 
-                    forum['posts'].splice(i, 1) 
-                    forum.save((err) => { 
-                        if (err) return res.status(500).send({ message: `Error deleting post: ${err}` }) 
-                        return res.status(200).send({ message: 'Post Deleted successfully' }) 
-                    }) 
-                } else { 
-                    for (var j = 0; j < forum['posts'][i]['answers'].length; j++) { 
-                        if (forum['posts'][i]['answers'][j]['_id'].toString() === elementToDelete) { 
-                            forum['posts'][i]['answers'].splice(j, 1) 
-                            forum.save((err) => { 
-                                if (err) return res.status(500).send({ message: `Error deleting answer: ${err}` }) 
-                                return res.status(200).send({ message: 'Answer Deleted successfully' }) 
-                            }) 
-                        } 
-                    } 
-                } 
-            } 
-            return res.status(500) 
-        } 
-    }) 
-} 
 
 module.exports = {
     getPosts,
     getPost,
     addPost,
     addAnswer,
+    addAnswerResp,
     createForum,
     deleteForum,
     updateForum,
