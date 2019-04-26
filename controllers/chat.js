@@ -1,5 +1,4 @@
 const Chat = require('../models/chat')
-const mongoose = require('mongoose')
 //const Forum = require('../models/forum')
 const Forum = require('../controllers/forums')
 
@@ -16,14 +15,13 @@ const createChat = (groupName) => {
     }
 }
 
-//MODIFICAR PARA AÑADIR LOS MENSAJES CON EL MODELO MODIFICADO
-/*const addMessage = (req, res) => {
+const addMessage = (req, res) => {
     let valid = validMessage(req)
     if (valid[1]) {
         Chat.Chat.findOne({groupName : req.params.groupName}, async function (err, chat) {
             if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
             if (!chat) return res.status(404).send({ message: `Chat doesn't exist` })
-            let message = new Chat.Chat() 
+            let message = new Chat.Message() 
             message.content =  req.body.content,
             message.author = req.body.author
             message.likes = req.body.likes
@@ -42,10 +40,11 @@ const createChat = (groupName) => {
                 let replyMessageId = ""
                 let reply = new Chat.Reply()
                 if(!req.body.replies[0].messageId) {
-                    await Chat.Message.findOne({date: req.body.replies[0].date, author: req.body.replies[0].author, content: req.body.replies[0].reply}, {_id:1}, (err, messageId) => {
+                    await Chat.Chat.findOne({groupName: req.params.groupName, 'messages.date': req.body.replies[0].date, 'messages.content': req.body.replies[0].reply}, {_id: 0, 'messages.$': 1}, (err, messageId) => {
                         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
                         if (!messageId) return res.status(404).send({ message: `Message doesn't exist` })
-                        replyMessageId = messageId._id
+                        //console.log(messageId)
+                        replyMessageId = messageId.messages[0]._id
                     })
                     reply.idMessage = replyMessageId
                 }
@@ -55,49 +54,20 @@ const createChat = (groupName) => {
                 reply.date = req.body.replies[0].date
                 reply.author = req.body.replies[0].author
                 reply.reply = req.body.replies[0].reply
-                reply.save((err) => {
-                    if (err) return res.status(500).send({ message: `Error saving the reply: ${err}` })
-                })
                 message.replies.push(reply)
                 //Add Question to Answer
+                
                 Forum.addAnswer(req, function(correctAdded) {
                     if(!correctAdded[1]) {
                         return res.status(404).send({ message: correctAdded[0] })
                     }
                }) 
-            }
+            } 
             chat.messages.push(message)
             //Add message 
-            message.save((err) => {
-                if (err) return res.status(500).send({ message: `Error saving the question: ${err}` })
-            })
             chat.save((err) => {
                 if (err) return res.status(500).send({ message: `Error saving the message: ${err}` })
                 return res.status(200).send({ message: `Message received` })
-            })
-        })
-    } else {
-        return res.status(500).send({ message: valid[0] })
-    }
-} */
-    const addMessage = (req, res) => {
-        let valid = validMessage(req)
-        if (valid[1]) { 
-            let message = {
-                content :  req.body.content,
-                author : req.body.author,
-                likes : req.body.likes,
-                dislikes : req.body.dislikes,
-                type : req.body.type,
-                date : req.body.date,
-                messageId: mongoose.Types.ObjectId()
-                }
-            Chat.Chat.findOneAndUpdate({groupName : req.params.groupName}, {$push: {messages:message}}, (err, chat) => {
-            if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
-            if (!chat) return res.status(404).send({ message: `Chat doesn't exist` })
-
-            Chat.Chat.findOne({groupName : req.params.groupName, 'messages.content' : 'cabeza'}, {'messages.$.[0].content' :1}, (err, message) => {
-                console.log(message)
             })
         })
     } else {

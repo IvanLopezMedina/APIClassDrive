@@ -54,9 +54,6 @@ const addPost = (req, cb) => {
                 post.author = req.body.author
                 post.likes = req.body.likes
                 post.dislikes = req.body.dislikes
-                post.save((err) => {
-                    if (err) cb([`Error creating post: ${err}`, false])
-                })
                 forum.posts.push(post)
                 forum.save((err) => {
                     if (err) cb([`Error creating post: ${err}`, false])
@@ -71,26 +68,29 @@ const addPost = (req, cb) => {
 
 const addAnswer = (req, cb) => {
         
-        Forum.Post.findOne({author: req.body.replies[0].author, date: req.body.replies[0].date, content: req.body.replies[0].reply}, {_id: 1}, (err, questionId) => {
+        Forum.Forum.findOne({groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date,
+         'posts.content': req.body.replies[0].reply}, {_id: 0, 'posts.$':1}, (err, questionId) => {
         if (err) return cb([`Error retrieving data: ${err}`, false])
-        if (!questionId) return cb([`Forum doesnt exist`, false])
+        if (!questionId) return cb([`Forum doesnt exist`, false]) 
+        
+        //console.log(questionId) //Para acceder al _id tenemos que hacer questionId.posts[0]._id
         let answer = new Forum.Answer()
         answer.answer = req.body.content
         answer.date = req.body.date
         answer.author = req.body.author
         answer.likes = req.body.likes
         answer.dislikes = req.body.dislikes
-        Forum.Post.updateOne({ _id: questionId._id}, { $push: { answers: answer } }, (err, result) => {
-            if (err) [`Error updating groups: ${err}`, false]
-            if (!result) return cb([`Answer doesn't exist`, false])
-            return cb(["", true])
-        }) 
-        Forum.Post.findOne({_id: questionId._id}, {answers:1}, (err, result) => {
-            console.log(result) //En Post se pushea correctamente la respuesta pero en Studio 3T no aparece porque depende de Forum.Forum
-        })
+        questionId.posts[0].answers.push(answer)
+        /*Forum.Forum.update({groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date,
+         'posts.content': req.body.replies[0].reply}, {$push:{'posts.answers': questionId}})*/
 
-        //Forum.Forum.findOneAndUpdate({'posts._id: questionId._id}, { $push: { 'posts.answers': answer }, etc... ya lo he probado pero como hay varios que coinciden no sabe cual updatear y no updatea ninguno.
-        //Forum.Forum.updateOne tambien lo he probado y nada. 
+            
+        Forum.Forum.updateOne({groupName: req.params.groupName, 'posts._id': questionId.posts[0]._id}, {push:{'posts.answers.$': answer}}, (err, result) => {
+           /* if (err) [`Error updating groups: ${err}`, false]
+            if (!result) return cb([`Answer doesn't exist`, false]) */
+            console.log(result)
+            //return cb(["", true])    
+        })
     })
 }
 
@@ -161,3 +161,4 @@ module.exports = {
     updateForum,
     deleteForumElement
 }
+
