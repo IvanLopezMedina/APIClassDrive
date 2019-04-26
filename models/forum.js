@@ -5,7 +5,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const answerSchema = new Schema({
     idQuestion: ObjectId,
     answers: []
-    },
+},
 { versionKey: false
 })
 
@@ -15,7 +15,7 @@ const postSchema = new Schema({
     author: String,
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-    },
+},
 { versionKey: false
 })
 
@@ -34,4 +34,3 @@ module.exports = {
     Answer,
     Post
 }
-

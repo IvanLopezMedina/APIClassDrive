@@ -13,4 +13,3 @@ router.get('/private', auth, function (req, res) {
 })
 
 module.exports = router
-

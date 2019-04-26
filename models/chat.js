@@ -8,7 +8,7 @@ const replySchema = new Schema({
     author: String, 
     reply: String,
     date: String
-    },
+},
 { versionKey: false
 })
 
@@ -20,15 +20,14 @@ const messageSchema = new Schema({
     dislikes: { type: Number, default: 0 },
     replies: [replySchema],
     type: String
-    },
+},
 { versionKey: false
 })
-
 
 const chatSchema = new Schema({
     groupName: String,
     messages: [messageSchema]
-    },
+},
 { versionKey: false
 })
 
@@ -38,5 +37,5 @@ const Reply = mongoose.model('reply', replySchema)
 module.exports = {
     Chat,
     Message,
-    Reply  
+    Reply
 }

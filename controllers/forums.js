@@ -1,7 +1,6 @@
 const Forum = require('../models/forum')
 const mongoose = require('mongoose')
 
-
 const createForum = (groupName) => {
     if (groupName == null || groupName === '') {
         return ['Error, groupName is empty', 400, false]
@@ -14,7 +13,6 @@ const createForum = (groupName) => {
         return ['', 200, true]
     }
 }
-
 
 const addPost = (req, cb) => {
     var valid = validPost(req)
@@ -43,43 +41,41 @@ const addPost = (req, cb) => {
 }
 
 const addAnswer = (req, cb) => {
-        
-        Forum.Forum.findOne({groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply}, {_id: 0, 'posts.$':1}, (err, questionId) => {
+    console.log('holi')
+    Forum.Forum.findOne({ groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }, { _id: 0, 'posts.$': 1 }, (err, questionId) => {
         if (err) return cb([`Error retrieving data: ${err}`, false])
         if (questionId) {
             let answers = {
-            answer : req.body.content,
-            date : req.body.date,
-            author : req.body.author,
-            likes : req.body.likes,
-            dislikes : req.body.dislikes,
-            answerId: mongoose.Types.ObjectId()
+                answer: req.body.content,
+                date: req.body.date,
+                author: req.body.author,
+                likes: req.body.likes,
+                dislikes: req.body.dislikes,
+                answerId: mongoose.Types.ObjectId()
             }
-            Forum.Answer.findOneAndUpdate({idQuestion : questionId.posts[0]._id}, {$push:{answers: answers}}, (err, updated) => {
+            Forum.Answer.findOneAndUpdate({ idQuestion: questionId.posts[0]._id }, { $push:{ answers: answers } }, (err, updated) => {
                 if (err) return cb([`Error retrieving data: ${err}`, false])
-                    if(!updated) {
-                        let answer = new Forum.Answer()
+                if (!updated) {
+                    let answer = new Forum.Answer()
                     answer.idQuestion = questionId.posts[0]._id
                     answer.answers.push(answers)
                     answer.save((err) => {
-                    if (err) return [`Error creating the answer: ${err} `, 500, false]
+                        if (err) return [`Error creating the answer: ${err} `, 500, false]
                     })
-                    return ['', 200, true] 
-                } 
-                    
+                    return ['', 200, true]
+                }
             })
-                               
         }
     })
 }
 
-const addAnswerResp = (req, res) => { //Funcion para añadir respuestas a una pregunta desde Forum en vez de Chat (ruta sigue siendo la misma)
-    addAnswer(req, function(correctAdded) {
-        if(!correctAdded[1]) {
+const addAnswerResp = (req, res) => { // Funcion para añadir respuestas a una pregunta desde Forum en vez de Chat (ruta sigue siendo la misma)
+    addAnswer(req, function (correctAdded) {
+        if (!correctAdded[1]) {
             return res.status(404).send({ message: correctAdded[0] })
         }
         return res.status(200).send({ message: 'Answer created successfully' })
-   })
+    })
 }
 
 const validPost = function (req) {
@@ -89,7 +85,6 @@ const validPost = function (req) {
     else if (author == null || author === '') return [`Error author is empty`, false]
     return ['', true]
 }
-
 
 //////////////////////////////////////////ESTAS FUNCIONES SE TIENEN QUE REVISAR (ABAJO) --> ////////////////////////////////////////////////////////
 const getPosts = (req, res) => {
@@ -136,8 +131,6 @@ const updateForum = (req, res) => {
     })
 }
 
-
-
 const deleteForumElement = function (req, res) {
     let groupName = req.params.groupName
     let elementToDelete = req.body.idToDelete
@@ -181,4 +174,3 @@ module.exports = {
     updateForum,
     deleteForumElement
 }
-
