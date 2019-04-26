@@ -1,6 +1,6 @@
 const Chat = require('../models/chat')
-//const Forum = require('../models/forum')
 const Forum = require('../controllers/forums')
+
 
 const createChat = (groupName) => {
     if (groupName == null || groupName === '') {
@@ -43,7 +43,6 @@ const addMessage = (req, res) => {
                     await Chat.Chat.findOne({groupName: req.params.groupName, 'messages.date': req.body.replies[0].date, 'messages.content': req.body.replies[0].reply}, {_id: 0, 'messages.$': 1}, (err, messageId) => {
                         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
                         if (!messageId) return res.status(404).send({ message: `Message doesn't exist` })
-                        //console.log(messageId)
                         replyMessageId = messageId.messages[0]._id
                     })
                     reply.idMessage = replyMessageId

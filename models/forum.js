@@ -3,12 +3,10 @@ const Schema = mongoose.Schema
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 const answerSchema = new Schema({
-    author: String,
-    date: String,
-    answer: String,
-    likes: { type: Number, default: 0 },
-    dislikes: { type: Number, default: 0 },
-    idMessage: ObjectId
+    idQuestion: ObjectId,
+    answers: []
+    },
+{ versionKey: false
 })
 
 const postSchema = new Schema({
@@ -17,7 +15,8 @@ const postSchema = new Schema({
     author: String,
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-    answers: [answerSchema]
+    },
+{ versionKey: false
 })
 
 const ForumSchema = new Schema({

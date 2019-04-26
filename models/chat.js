@@ -8,6 +8,8 @@ const replySchema = new Schema({
     author: String, 
     reply: String,
     date: String
+    },
+{ versionKey: false
 })
 
 const messageSchema = new Schema({
@@ -18,7 +20,10 @@ const messageSchema = new Schema({
     dislikes: { type: Number, default: 0 },
     replies: [replySchema],
     type: String
+    },
+{ versionKey: false
 })
+
 
 const chatSchema = new Schema({
     groupName: String,

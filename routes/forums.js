@@ -6,7 +6,7 @@ const auth = require('../middlewares/auth')
 router.get('/posts/:forumId', forumsCtrl.getPosts)
 router.get('/post/:postId', forumsCtrl.getPost)
 router.put('/addPost/:groupName', forumsCtrl.addPost)
-router.put('/addAnswer/:groupName', forumsCtrl.addAnswer)
+router.put('/addAnswer/:groupName', forumsCtrl.addAnswerResp)
 router.put('/updateForum/:groupName', forumsCtrl.updateForum)
 router.delete('/deleteForumElement/:groupName', forumsCtrl.deleteForumElement)
 // Adding auth to the method, we ensure that the forum has a valid token

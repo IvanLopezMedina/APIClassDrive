@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+mongoose.set('useFindAndModify', false);   //Bug version of mongoose
 const app = require('./app')
 const config = require('./config')
 const socketIo = require('socket.io')
