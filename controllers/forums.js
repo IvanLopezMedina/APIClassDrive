@@ -41,31 +41,20 @@ const addPost = (req, cb) => {
 }
 
 const addAnswer = (req, cb) => {
-    console.log('holi')
-    Forum.Forum.findOne({ groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }, { _id: 0, 'posts.$': 1 }, (err, questionId) => {
-        if (err) return cb([`Error retrieving data: ${err}`, false])
-        if (questionId) {
-            let answers = {
-                answer: req.body.content,
-                date: req.body.date,
-                author: req.body.author,
-                likes: req.body.likes,
-                dislikes: req.body.dislikes,
-                answerId: mongoose.Types.ObjectId()
-            }
-            Forum.Answer.findOneAndUpdate({ idQuestion: questionId.posts[0]._id }, { $push:{ answers: answers } }, (err, updated) => {
-                if (err) return cb([`Error retrieving data: ${err}`, false])
-                if (!updated) {
-                    let answer = new Forum.Answer()
-                    answer.idQuestion = questionId.posts[0]._id
-                    answer.answers.push(answers)
-                    answer.save((err) => {
-                        if (err) return [`Error creating the answer: ${err} `, 500, false]
-                    })
-                    return ['', 200, true]
-                }
-            })
-        }
+
+    let answer = new Forum.Answer()
+    answer.answer = req.body.content
+    answer.author = req.body.author
+    answer.date = req.body.date
+    answer.likes = req.body.likes
+    answer.dislikes = req.body.dislikes
+    //Query for Chat
+    if(!req.body.postId) query = {groupName: req.params.groupName,'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply}
+    //Query for Forum
+    else query = {groupName: req.params.groupName,'posts._id': req.body.postId} 
+    Forum.Forum.findOneAndUpdate( query, { $push: { 'posts.$.answers': answer } }, (err, forum) => {
+        if (err) cb([`Error retrieving data: ${err}`, false])
+        if (forum) cb(['Answer added correctly', true])        
     })
 }
 
