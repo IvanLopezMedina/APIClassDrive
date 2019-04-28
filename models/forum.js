@@ -1,22 +1,21 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-const ObjectId = mongoose.Schema.Types.ObjectId
 
 const answerSchema = new Schema({
-    idQuestion: ObjectId,
-    answers: []
-},
-{ versionKey: false
+    author: String,
+    date: String,//{ type: Date, default: Date.now() },
+    answer: String,
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 }
 })
 
 const postSchema = new Schema({
     content: String,
-    date: String,
+    date: String,//{ type: Date, default: Date.now() },
     author: String,
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-},
-{ versionKey: false
+    answers: [answerSchema]
 })
 
 const ForumSchema = new Schema({
