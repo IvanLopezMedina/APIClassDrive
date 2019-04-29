@@ -4,8 +4,7 @@ const forumCtrl = require('./forums')
 const Search = require('../models/search')
 // const { check, validationResult } = require('express-validator');
 
-const createGroup = async function (req, res){
-
+const createGroup = async function (req, res) {
     let valid = validGroup(req)
     if (valid[1]) {
         let group = new Group()
@@ -132,7 +131,7 @@ const getGroupwithSearch = async function (req, res) {
                 }
                 else {
                     searchMap.set(search[j].name, 1)
-                }
+                }s
             }
             if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
         })

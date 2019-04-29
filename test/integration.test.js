@@ -1,4 +1,6 @@
 /* eslint-disable no-undef */
+// me creo un usuari, un grup i el poses dintre
+// fer testos pero ciclic fer grup i borrarlo per aixi que funcioni sempre
 const app = require('../app')
 const request = require('supertest')
 const mongoose = require('mongoose')
@@ -32,7 +34,7 @@ describe('API Tests', function () {
     describe('## Create User ', function () {
         it('should create a user', function (done) {
             request(app).post('/api/signup').send(user).end(function (err, res) {
-                if (err) assert.strictEqual(500, res.statusCode)
+                if (err) assert.strictEqual(409, res.statusCode)
                 assert.strictEqual(200, res.statusCode)
                 assert.strictEqual(res.body.user.name, 'Ivan')
                 done()
@@ -53,16 +55,6 @@ describe('API Tests', function () {
             request(app).get('/api/groupname/noexisteix').end(function (err, res) {
                 if (err) assert.strictEqual(200, res.statusCode)
                 assert.strictEqual(404, res.statusCode)
-                done()
-            })
-        })
-    })
-    describe('## Subscribe a member ', function () {
-        it('should subscribe ', function (done) {
-            request(app).put('/api/subscribe/5c98b2116c3e6d3eac21142d').end(function (err, res) {
-                if (err) assert.strictEqual(404, res.statusCode)
-                assert.strictEqual(200, res.statusCode)
-                // com es fa per pasarli al id del usuari
                 done()
             })
         })
