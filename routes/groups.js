@@ -11,7 +11,7 @@ router.post('/isadmin/:groupName', groupCtrl.isAdmin)
 
 router.get('/groups', groupCtrl.getGroups)
 router.get('/groups/:groupId', groupCtrl.getGroup)
-router.get('/groupsname/:name', groupCtrl.getGroupName)
+router.get('/groupsname', groupCtrl.getGroupName)
 router.get('/groupusers/:groupId', groupCtrl.getUsers)
 
 router.delete('/groups/:groupId', groupCtrl.deleteGroup)
