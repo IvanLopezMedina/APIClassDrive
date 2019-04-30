@@ -1,5 +1,4 @@
 const Forum = require('../models/forum')
-const mongoose = require('mongoose')
 
 const createForum = (groupName) => {
     if (groupName == null || groupName === '') {
@@ -43,21 +42,20 @@ const addPost = (req, cb) => {
 const addAnswer = (req, cb) => {
 
     let answer = new Forum.Answer()
+    let query
     answer.answer = req.body.content
     answer.author = req.body.author
     answer.date = req.body.date
     answer.likes = req.body.likes
     answer.dislikes = req.body.dislikes
-    //Query for Chat
-    if(!req.body.postId) query = {groupName: req.params.groupName,'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply}
-    //Query for Forum
-    else query = {groupName: req.params.groupName,'posts._id': req.body.postId} 
-    Forum.Forum.findOneAndUpdate( query, { $push: { 'posts.$.answers': answer } }, (err, forum) => {
+
+    if (!req.body.postId) query = { groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }
+    else query = { groupName: req.params.groupName, 'posts._id': req.body.postId } 
+    Forum.Forum.findOneAndUpdate(query, { $push: { 'posts.$.answers': answer } }, (err, forum) => {
         if (err) cb([`Error retrieving data: ${err}`, false])
         if (forum) cb(['Answer added correctly', true])        
     })
 }
-
 
 const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forumen vez de Chat (ruta sigue siendo la misma)
     addPost(req, function (correctAdded) {
@@ -85,9 +83,8 @@ const validPost = function (req) {
     return ['', true]
 }
 
-
 const getPosts = (req, res) => {
-    Forum.Forum.findOne({groupName: req.params.groupName}, {_id:0, 'posts._id':1, 'posts.content':1, 'posts.author':1, 'posts.date':1, 'posts.answers':1}, (err, forum) => {
+    Forum.Forum.findOne({ groupName: req.params.groupName }, { _id: 0, 'posts._id': 1, 'posts.content': 1, 'posts.author': 1, 'posts.date': 1, 'posts.answers': 1 }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
         res.status(200).send(forum.posts)
@@ -129,7 +126,6 @@ const updateForum = (req, res) => {
 const deleteForumElement = function (req, res) {
     let group = req.params.groupName
     let postId = req.body.postId
-    
     // If the element is a post
     if (postId == null) {
         Forum.Forum.updateOne({ groupName: group }, { $pull: { 'posts': { '_id': req.body.idToDelete } } }, (err, forum) => {
