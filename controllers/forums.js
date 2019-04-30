@@ -58,6 +58,16 @@ const addAnswer = (req, cb) => {
     })
 }
 
+
+const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forumen vez de Chat (ruta sigue siendo la misma)
+    addPost(req, function (correctAdded) {
+        if (!correctAdded[1]) {
+            return res.status(404).send({ message: correctAdded[0] })
+        }
+        return res.status(200).send({ message: 'Post created successfully' })
+    })
+}
+
 const addAnswerResp = (req, res) => { // Funcion para añadir respuestas a una pregunta desde Forum en vez de Chat (ruta sigue siendo la misma)
     addAnswer(req, function (correctAdded) {
         if (!correctAdded[1]) {
@@ -75,14 +85,12 @@ const validPost = function (req) {
     return ['', true]
 }
 
-//////////////////////////////////////////ESTAS FUNCIONES SE TIENEN QUE REVISAR (ABAJO) --> ////////////////////////////////////////////////////////
+
 const getPosts = (req, res) => {
-    let groupName = req.params.groupName
-    Forum.Forum.findOne(groupName, (err, forum) => {
+    Forum.Forum.findOne({groupName: req.params.groupName}, {_id:0, 'posts._id':1, 'posts.content':1, 'posts.author':1, 'posts.date':1, 'posts.answers':1}, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
-        var posts = forum[ 'posts' ]
-        res.status(200).send({ posts })
+        res.status(200).send(forum.posts)
     })
 }
 
@@ -111,7 +119,6 @@ const deleteForum = function (name) {
 
 const updateForum = (req, res) => {
     let groupName = req.params.groupName
-
     Forum.Forum.updateOne({ groupName: groupName }, { $set: { groupName: req.body.groupName, posts: req.body.posts } }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum does not exist` })
@@ -146,6 +153,7 @@ module.exports = {
     addPost,
     addAnswer,
     addAnswerResp,
+    addPostResp,
     createForum,
     deleteForum,
     updateForum,
