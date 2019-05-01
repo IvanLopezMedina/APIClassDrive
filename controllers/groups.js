@@ -138,7 +138,7 @@ const getGroupwithSearch = async function (req, res) {
                 }
                 else {
                     searchMap.set(search[j].name, 1)
-                }s
+                }
             }
             if (err) return res.status(500).send({ message: `Error searching groups: ${err}` })
         })
