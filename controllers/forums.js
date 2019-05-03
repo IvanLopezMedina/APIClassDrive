@@ -105,8 +105,6 @@ const addAnswer = (req, res) => {
         }
     })
 }
-
-
 const deleteForum = function (name) {
     Forum.Forum.findOneAndRemove({ groupName: name }, (err, forum) => {
         if (err) return { message: `Error deleting the forum: ${err}` }
