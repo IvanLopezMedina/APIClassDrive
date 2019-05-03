@@ -54,11 +54,11 @@ const getUser = (req, res) => {
     })
 }
 
-const updateUser = (req, res) => {
+const updateUser = async function (req, res) {
     let userId = req.params.userId
     let update = req.body
-
-    User.findByIdAndUpdate(userId, update, (err, userUpdated) => {
+    
+    User.findByIdAndUpdate(userId, update.user, {new: true}, (err, userUpdated) => {
         if (err) return res.status(409).send({ message: `Error updating product: ${err}` }) 
         res.status(200).send({ user: userUpdated })
     })
