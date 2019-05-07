@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const ObjectId = mongoose.Schema.Types.ObjectId
 
 const QuestionsSchema = new Schema({
-    question: String,
+    question: [String],
     answer: [String],
-    correctAnswer: [String],
+    correctAnswer: [Number],
     versionKey: false
 },
 {
@@ -15,12 +16,20 @@ const Questions = mongoose.model('questions', QuestionsSchema)
 const TestSchema = new Schema({
     name: {
         type: String,
-        required: true,
-        unique: true },
+        required: true
+    },
     groupName: {
         type: String
     },
-    questions: [QuestionsSchema]
+    questions: [QuestionsSchema],
+    user: {
+        type: String,
+        required: true
+    },
+    creationDate: {
+        type: Date,
+        default: Date.now()
+    },
 },
 {
     versionKey: false
