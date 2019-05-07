@@ -3,8 +3,8 @@ const Test = require('../models/test')
 const addTest = (req, res) => {
     let test = new Test.Test()
     let question = new Test.Questions()
-
     test.name = req.body.name
+    test.user = req.body.user
     test.groupName = req.body.groupName
     question.question = req.body.question
     question.answer = req.body.answer
@@ -23,10 +23,9 @@ const addTest = (req, res) => {
 }
 
 const getAllTest = (req, res) => {
-    Test.Test.find({ groupName: req.params.groupName }, (err, test) => {
+    Test.Test.find({ groupName: req.params.groupName }, {_id:1, user:1, creationDate:1, name:1}, (err, test) => { //Añadir la cuenta de preguntas que tiene con la proyeccion (Cris en clase de Mongo)
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
-
         res.status(200).send(test)
     })
 }
@@ -34,7 +33,7 @@ const getAllTest = (req, res) => {
 const getTest = (req, res) => {
     let testId = req.params.testId
 
-    Test.Test.findById(testId, (err, test) => {
+    Test.Test.findById(testId, {_id:0, groupName:0, creationDate:0}, (err, test) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
 
