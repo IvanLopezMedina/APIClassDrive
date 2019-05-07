@@ -96,7 +96,7 @@ const updateAvatar = (req, res) => {
                 if (!fs.existsSync('profiles/')) {
                     fs.mkdirSync('profiles/')
                 }
-                user.avatar = path
+                user.avatar = disp + '.' + ext
                 let base64data = data.replace(/^data:.*/, '')
                 fs.writeFile(path, base64data, 'base64', (err) => {
                     if (err) return res.status(409).send({ msg: `Error uploading the file: ${err}` })
@@ -104,12 +104,23 @@ const updateAvatar = (req, res) => {
 
                 user.save((err) => {
                     if (err || invalid) return res.status(409).send({ msg: `Error uploading the file: ${err}` })
-                    return res.status(200).send({ msg: `File added successfuly` })
+                    return res.status(200).send({ user: user })
                 })
             })
         } catch (e) {
             console.error(e)
         }
+    })
+}
+
+const getImage = (req, res) => {
+    let fileName = req.params.filename
+
+    fs.readFile('./profiles/' + fileName, 'base64', (err, base64Image) => {
+        if (err) res.status(500).send('Error')
+
+        const dataUrl = `data:image/jpeg;base64, ${base64Image}`
+        return res.status(200).send({ img: `${base64Image}` })
     })
 }
 
@@ -120,5 +131,6 @@ module.exports = {
     updateUser,
     getUser,
     getUsers,
-    updateAvatar
+    updateAvatar,
+    getImage
 }
