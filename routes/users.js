@@ -5,7 +5,9 @@ const router = express.Router()
 
 router.get('/users', usersCtrl.getUsers)
 router.get('/users/:userId', usersCtrl.getUser)
+router.get('/users/getimage/:filename', usersCtrl.getImage)
 router.put('/users/:userId', usersCtrl.updateUser)
+router.put('/users/updateavatar/:displayname', usersCtrl.updateAvatar)
 router.delete('/users/:userId', usersCtrl.deleteUser)
 
 router.post('/signup', usersCtrl.signUp)
