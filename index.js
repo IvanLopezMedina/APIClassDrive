@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+mongoose.set('useFindAndModify', false)   //Bug version of mongoose
 const app = require('./app')
 const config = require('./config')
 const socketIo = require('socket.io')
@@ -21,26 +22,21 @@ mongoose.connect(config.db, (err, res) => {
     })
 })
 
-
 io.on('connection', socket => {
-    //console.log("Socket connected: " + socket.id)    
     socket.on('initConn', groupname => {
         socket.join(groupname)
     })
     socket.on('finishConn', groupname => {
         socket.leave(groupname)
     })
-    socket.on('message', (body, displayname, groupname) => {
-        socket.to(groupname).broadcast.emit('message', {
-        body,
-        from: displayname
-        })
+    socket.on('message', (message, groupname) => {
+        socket.to(groupname).broadcast.emit('message', message)
     }) 
     socket.on('typing', (displayname, groupname) => {
         socket.to(groupname).broadcast.emit('typing', {
-        message: displayname+" está escribiendo"
+            message: displayname + 'está escribiendo'
         })
-    }) 
+    })
     socket.on('cancelTyping', groupname => {
         socket.to(groupname).broadcast.emit('cancelTyping')
     })
