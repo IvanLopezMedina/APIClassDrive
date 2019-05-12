@@ -21,56 +21,71 @@ const createGroup = async function (req, res) {
         group.admin = id
         group.users = [id]
         group.avatar = group.gravatar()
+        let error = false
 
-        //Add Group to Collection Forum
-        let val = forumCtrl.createForum(req.body.name)
-        if (!val[2]) {
-            return res.status(val[1]).send({ msg: val[0] })
-        }
-
-        //Add Group to Collection Chat
-        val = chatCtrl.createChat(req.body.name)
-        if (!val[2]) {
-            return res.status(val[1]).send({ msg: val[0] })
-        }
-
-        //Add values to Collection Search 
-        await Search.countDocuments({ name: req.body.name }, function (err, count) {
-            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-            if(count === 0) { //new name
-                search.name = req.body.name.toLowerCase()
-                search.type = "name"
-                search.nSearches = 0
-                search.save((err) => {
-                    if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                    })
-                }
-            })   
-        for(let i=0; i<req.body.tags.length; i++) {
-            await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
-                if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                if(count === 0) { //new tag
-                    arrayTags.push({ name : req.body.tags[i].toLowerCase(), type : "tags", nSearches : 0 })
-                }
-            }) 
-        }
-        if(arrayTags.length !== 0) {
-                search.collection.insertMany(arrayTags, function (err) {
-                if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                }) 
-            }
         if (group.validatePassword() || 'public'.match(req.body.visibility)) {
-        //Add Group to Collection Users
-            User.updateOne({ _id: id, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
-                if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
-                if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-            })
+
         //Add Group to Collection Groups
-            group.save((err) => {
-                if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                return res.status(200).send({ group: group })
-            })
+        group.save( async function (err) {
+            if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+            else {
+
+                //Add Group to Collection Users
+                User.updateOne({ _id: id, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
+                    if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
+                    if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
+                })
+
+                //Add Group to Collection Forum
+                let val = forumCtrl.createForum(req.body.name)
+                if (!val[2]) {
+                    return res.status(val[1]).send({ msg: val[0] })
+                }
+
+                //Add Group to Collection Chat
+                val = chatCtrl.createChat(req.body.name)
+                if (!val[2]) {
+                    return res.status(val[1]).send({ msg: val[0] })
+                }
+
+                //Add values to Collection Search 
+                await Search.countDocuments({ name: req.body.name }, function (err, count) {
+                    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                    if(count === 0) { //new name
+                        search.name = req.body.name.toLowerCase()
+                        search.type = "name"
+                        search.nSearches = 0
+                        search.save((err) => {
+                            if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+                            })
+                        }
+                    })   
+                for(let i=0; i<req.body.tags.length; i++) {
+                    await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
+                        if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                        if(count === 0) { //new tag
+                            arrayTags.push({ name : req.body.tags[i].toLowerCase(), type : "tags", nSearches : 0 })
+                        }
+                    }) 
+                }
+                if(arrayTags.length !== 0) {
+                    search.collection.insertMany(arrayTags, function (err) {
+                    if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+                    }) 
+                }
+            }
+            return res.status(200).send({ group: group })
+        })
+        
+
         } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
+
+
+        
+
+        
+
+        
     } else {
         return res.status(500).send({ message: valid[0] })
     }

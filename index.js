@@ -34,7 +34,7 @@ io.on('connection', socket => {
     }) 
     socket.on('typing', (displayname, groupname) => {
         socket.to(groupname).broadcast.emit('typing', {
-            message: displayname + 'está escribiendo'
+            message: displayname + ' está escribiendo'
         })
     })
     socket.on('cancelTyping', groupname => {
