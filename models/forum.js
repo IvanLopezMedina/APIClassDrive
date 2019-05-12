@@ -6,7 +6,8 @@ const answerSchema = new Schema({
     date: String,//{ type: Date, default: Date.now() },
     answer: String,
     likes: { type: Number, default: 0 },
-    dislikes: { type: Number, default: 0 }
+    dislikes: { type: Number, default: 0 },
+    avatar: String
 })
 
 const postSchema = new Schema({
@@ -15,7 +16,8 @@ const postSchema = new Schema({
     author: String,
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
-    answers: [answerSchema]
+    answers: [answerSchema],
+    avatar: String
 })
 
 const ForumSchema = new Schema({

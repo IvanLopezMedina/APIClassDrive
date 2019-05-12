@@ -1,4 +1,5 @@
 const Forum = require('../models/forum')
+const fs = require('fs')
 
 const createForum = (groupName) => {
     if (groupName == null || groupName === '') {
@@ -92,21 +93,35 @@ const getPosts = (req, res) => {
 }
 
 const getPost = (req, res) => {
-    let groupName = req.body.groupName
-    let postId = req.params.postId
-    let post
-    Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
+    let gn = req.params.groupName
+    let postId = req.body.postId
+    
+    Forum.Forum.findOne({ groupName: gn }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
-        post = forum['posts'].id(postId)
+        let post = forum['posts'].id(postId)
+
         if (post == null) {
             return res.status(404).send({ message: `Post doesn't exist` })
         } else {
+            for (let i = 0; i < post['answers'].length; i++) {
+                getImage(post['answers'][i]['avatar'], function (base64image, error) {
+                    if (error) console.error(error)
+                    post['answers'][i]['avatar'] = base64image
+                    console.log(post)
+                })
+            }
             res.status(200).send({ post })
         }
     })
 }
 
+function getImage (fileName, callback) {
+    fs.readFile('./profiles/' + fileName, 'base64', (err, base64Image) => {
+        if (err) console.error('Error')
+        return callback(base64Image)
+    })
+}
 
 const deleteForum = function (name) {
     Forum.Forum.findOneAndRemove({ groupName: name }, (err, forum) => {
@@ -154,5 +169,6 @@ module.exports = {
     createForum,
     deleteForum,
     updateForum,
-    deleteForumElement
+    deleteForumElement,
+    getImage
 }
