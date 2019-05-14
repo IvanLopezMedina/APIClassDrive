@@ -229,4 +229,17 @@ describe('API Tests', function () {
             })
         })
     })
+    describe('###### Function GetGroups Bucle', function () {
+        it('shouls send get groups one hundred times', function () {
+            let cont = 0
+            while (cont < 5) {
+                cont++
+                console.log(cont)
+                request(app).put('/api/getgroups').end(function (err, res) {
+                    if (err) assert.strictEqual(404, res.statusCode)
+                    assert.strictEqual(200, res.statusCode)
+                })
+            }
+        })
+    })
 })

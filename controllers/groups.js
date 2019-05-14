@@ -248,7 +248,7 @@ const getGroups = (req, res) => {
             }).select(' name tags avatar ')
         }
         res.status(200).send(infogroups)
-    })    
+    })
 }
 
 function getUsers (req, res) {
