@@ -220,26 +220,19 @@ const subscribe = (req, res) => {
 const unsubscribe = (req, res) => {
     let groupId = req.params.groupId
     let userId = req.body.userId
-    Group.findById(groupId, (err, group) => {
+
+    Group.updateOne({ _id: groupId }, { $pull: { 'users': userId } }, function (err, updated) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-        if (!group) return res.status(404).send({ message: `Group doesn't exist` })
-        let groupcontainsuser = (group.users.indexOf(userId) > -1)
-        if (groupcontainsuser) {
-            group.users.pull({ _id: userId })
-            group.save(function (err) {
-                if (err) return res.status(409).send({ message: `Error subscribing: ${err}` })
-                return res.status(200).send({ message: `User eliminated` })
-            })
-        } else return res.status(409).send({ message: `User not in the group` })
+        if (updated.nModified === 0) return res.status(404).send({ message: `User not in the group` })
+        return res.status(200).send({ message: `User eliminated` })
     })
 }
 
 const getGroups = (req, res) => {
     let userId = req.body.userId
-    Group.find( { users: { $in: userId } }, { name: 1, tags: 1, avatar: 1 }, function (err, infogroup) {
+    Group.find({ users: { $in: userId } }, { name: 1, tags: 1, avatar: 1 }, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
-        console.log(infogroup)
         res.status(200).send(infogroup)
     })
 }
