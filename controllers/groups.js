@@ -236,19 +236,12 @@ const unsubscribe = (req, res) => {
 
 const getGroups = (req, res) => {
     let userId = req.body.userId
-    User.findById(userId, {_id:0, groups:1}, async function (err, groups) {
+    Group.find( { users: { $in: userId } }, { name: 1, tags: 1, avatar: 1 }, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-        let infogroups = []
-        let groupArray = groups.groups
-        for (let i = 0; i < groupArray.length; i++) {
-            await Group.find({ name: groupArray[i] }, function (err, infogroup) {
-                if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-                if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
-                infogroups.push(infogroup[0])
-            }).select(' name tags avatar ')
-        }
-        res.status(200).send(infogroups)
-    })    
+        if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
+        console.log(infogroup)
+        res.status(200).send(infogroup)
+    })
 }
 
 function getUsers (req, res) {
