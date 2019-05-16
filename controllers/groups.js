@@ -31,12 +31,6 @@ const createGroup = async function (req, res) {
             if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
             else {
 
-                /*//Add Group to Collection Users
-                User.updateOne({ _id: id, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
-                    if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
-                    if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-                }) */
-
                 //Add Group to Collection Forum
                 let val = forumCtrl.createForum(req.body.name)
                 if (!val[2]) {
@@ -179,7 +173,6 @@ const subscribe = (req, res) => {
     let groupId = req.body.groupId
     let userId = req.body.userId
     let password = req.body.password
-    let groupName = req.body.groupName
     let valid = false
     Group.findById(groupId, async (err, group) => {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
@@ -199,11 +192,7 @@ const subscribe = (req, res) => {
             Group.updateOne({ _id: groupId, users: { $ne: userId } }, { $push: { users: userId } }, (err, result) => {
                 if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
                 if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-                User.updateOne({ _id: userId, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
-                    if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
-                    if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-                    res.status(200).send({ msg: 'Correct Subscribed' })
-                })
+                res.status(200).send({ msg: 'Correct Subscribed' })
             })
         } else res.status(409).send({ msg: `Invalid Password` })
     })

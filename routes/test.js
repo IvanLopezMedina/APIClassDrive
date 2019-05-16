@@ -6,7 +6,7 @@ const auth = require('../middlewares/auth')
 router.get('/alltests/:groupName', testCtrl.getAllTest)
 router.get('/test/:testId', testCtrl.getTest)
 router.put('/edittest/:testId', testCtrl.editTest)
-router.put('/deletetest/:testId', testCtrl.deleteTest)
+router.delete('/deletetest/:testId', testCtrl.deleteTest)
 
 router.post('/addtest', testCtrl.addTest)
 
