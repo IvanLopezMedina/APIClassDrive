@@ -249,11 +249,34 @@ const validGroup = function (req) {
     else return ['', true]
 }
 
+const changeAdmin = (req, res) => {
+    let groupName = req.body.groupName
+    let userId = req.body.userId
+    let newAdmin = req.body.newAdmin
+
+    Group.count({ name: groupName, admin: userId }, function (err, count) {
+        console.log(groupName + userId)
+        if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        console.log(count)
+        if (count === 1) { // It means that userId is admin in the group
+            User.find({ _id: newAdmin }, { displayname: 1 }, function (err, displayName) {
+                if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
+                Group.update({ name: groupName }, { $set:{ 'admin': displayName } }, { multi: false, upsert: false }, function (err, updated) {
+                    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                    if (!updated) return res.status(404).send({ msg: `Error: admin not valid: ${err}` })
+                    return res.status(200).send({ updated })
+                })
+            })
+        } else return res.status(409).send({ message: `This user is not an admin: ${err}` })
+    })
+}
+
 const isAdmin = (req, res) => {
     let message = `Not Admin`
     Group.countDocuments({ name: req.params.groupName, admin: req.body.userId }, function (err, count) {
-    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-        if(count === 1) { //is Admin
+        if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        if (count === 1) { // is Admin
             message = `Admin`
         }
         return res.status(200).send({ message })
@@ -271,6 +294,6 @@ module.exports = {
     subscribe,
     getUsers,
     unsubscribe,
-    isAdmin
+    isAdmin,
+    changeAdmin
 }
-
