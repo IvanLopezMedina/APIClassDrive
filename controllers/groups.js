@@ -254,13 +254,11 @@ const changeAdmin = (req, res) => {
     let userId = req.body.userId
     let newAdmin = req.body.newAdmin
 
-    let adminDisplayName = getDisplayName(userId)
+    let adminDisplayName = getDisplayName(res, userId)
     Group.count({ name: groupName, admin: adminDisplayName }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
         if (count === 1) { // It means that userId is admin in the group
-            let displayName = getDisplayName(newAdmin)
-            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-            if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
+            let displayName = getDisplayName(res, newAdmin)
             Group.update({ name: groupName }, { $set:{ 'admin': displayName } }, { multi: false, upsert: false }, function (err, updated) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
                 if (!updated) return res.status(404).send({ msg: `Error: admin not valid: ${err}` })
@@ -271,10 +269,10 @@ const changeAdmin = (req, res) => {
     })
 }
 
-function getDisplayName(userId) {
+function getDisplayName (res, userId) {
     User.find({ _id: userId }, { displayname: 1 }, function (err, displayName) {
-        if (err) return `Error retrieving count data: ${err}`
-        if (!displayName) return `Error: user not found: ${err}`
+        if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
         return displayName
     })
 }
