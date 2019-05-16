@@ -212,12 +212,9 @@ const unsubscribe = (req, res) => {
 const getGroups = (req, res) => {
     let userId = req.body.userId
     let moreInfo = req.body.moreInfo
-    let get = ""
+    let get = {}
     if(!moreInfo) {
         get = {_id: 1, name: 1, tags: 1, avatar: 1}
-    }
-    else {
-        get = {}
     }
     Group.find({ users: { $in: userId } }, get, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
