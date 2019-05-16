@@ -207,7 +207,7 @@ const unsubscribe = (req, res) => {
 const getGroups = (req, res) => {
     let userId = req.body.userId
     let moreInfo = req.body.moreInfo
-    let get = {}
+    let get = {_id:1, adminName:1, avatar:1, creationDate:1, name:1, users:1}
     if (!moreInfo) {
         get = { _id: 1, name: 1, tags: 1, avatar: 1 }
     }
