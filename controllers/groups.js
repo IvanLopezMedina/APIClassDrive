@@ -11,14 +11,15 @@ const createGroup = async function (req, res) {
         let group = new Group()
         let search = new Search()
         let arrayTags = []
-        let id = req.body.user
+        let displayName = req.body.user
+        let id = req.body.id
         let groupName = req.body.name
         group.name = groupName
         group.tags = req.body.tags
 
         group.visibility = req.body.visibility
         if ('private'.match(req.body.visibility)) group.password = req.body.password
-        group.admin = id
+        group.admin = displayName
         group.users = [id]
         group.avatar = group.gravatar()
         let error = false
@@ -30,11 +31,11 @@ const createGroup = async function (req, res) {
             if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
             else {
 
-                //Add Group to Collection Users
+                /*//Add Group to Collection Users
                 User.updateOne({ _id: id, groups: { $ne: groupName } }, { $push: { groups: groupName } }, (err, result) => {
                     if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
                     if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
-                })
+                }) */
 
                 //Add Group to Collection Forum
                 let val = forumCtrl.createForum(req.body.name)
@@ -76,16 +77,7 @@ const createGroup = async function (req, res) {
             }
             return res.status(200).send({ group: group })
         })
-        
-
         } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
-
-
-        
-
-        
-
-        
     } else {
         return res.status(500).send({ message: valid[0] })
     }
@@ -230,7 +222,15 @@ const unsubscribe = (req, res) => {
 
 const getGroups = (req, res) => {
     let userId = req.body.userId
-    Group.find({ users: { $in: userId } }, { name: 1, tags: 1, avatar: 1 }, function (err, infogroup) {
+    let moreInfo = req.body.moreInfo
+    let get = ""
+    if(!moreInfo) {
+        get = {_id: 1, name: 1, tags: 1, avatar: 1}
+    }
+    else {
+        get = {}
+    }
+    Group.find({ users: { $in: userId } }, get, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
         res.status(200).send(infogroup)
