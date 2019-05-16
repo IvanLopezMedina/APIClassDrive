@@ -19,8 +19,8 @@ const addPost = (req, cb) => {
     if (valid[1]) {
         let groupName = req.params.groupName
         Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
-            if (err) cb([`Error retrieving data: ${err}`, false])
-            if (!forum) cb([`Forum doesn't exist`, false])
+            if (err) cb(new Error([`Error retrieving data: ${err}`, false]))
+            if (!forum) cb(new Error([`Forum doesn't exist`, false]))
             else {
                 let post = new Forum.Post()
                 post.content = req.body.content
@@ -30,18 +30,17 @@ const addPost = (req, cb) => {
                 post.dislikes = req.body.dislikes
                 forum.posts.push(post)
                 forum.save((err) => {
-                    if (err) cb([`Error creating post: ${err}`, false])
-                    cb(["", true])
+                    if (err) cb(new Error([`Error creating post: ${err}`, false]))
+                    cb(new Array(['', true]))
                 })
             }
         })
     } else {
-        cb([valid[0], false])
+        cb(new Array([valid[0], false]))
     }
 }
 
 const addAnswer = (req, cb) => {
-
     let answer = new Forum.Answer()
     let query
     answer.answer = req.body.content
@@ -51,10 +50,10 @@ const addAnswer = (req, cb) => {
     answer.dislikes = req.body.dislikes
 
     if (!req.body.postId) query = { groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }
-    else query = { groupName: req.params.groupName, 'posts._id': req.body.postId } 
+    else query = { groupName: req.params.groupName, 'posts._id': req.body.postId }
     Forum.Forum.findOneAndUpdate(query, { $push: { 'posts.$.answers': answer } }, (err, forum) => {
-        if (err) cb([`Error retrieving data: ${err}`, false])
-        if (forum) cb(['Answer added correctly', true])        
+        if (err) cb(new Error([`Error retrieving data: ${err}`, false]))
+        if (forum) cb(new Error(['Answer added correctly', true]))
     })
 }
 
@@ -95,7 +94,7 @@ const getPosts = (req, res) => {
 const getPost = (req, res) => {
     let gn = req.params.groupName
     let postId = req.body.postId
-    
+
     Forum.Forum.findOne({ groupName: gn }, (err, forum) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!forum) return res.status(404).send({ message: `Forum doesn't exist` })
