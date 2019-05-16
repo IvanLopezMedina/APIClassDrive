@@ -19,7 +19,8 @@ const GroupSchema = Schema({
         type: String,
         minlength: 8
     },
-    admin: String,
+    admin: ObjectId,
+    adminName: String,
     users: {
         type: [ObjectId],
     },

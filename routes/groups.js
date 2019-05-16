@@ -9,7 +9,6 @@ router.post('/searchgroups', groupCtrl.searchGroup)
 router.post('/getgroupswithsearch', groupCtrl.getGroupwithSearch)
 router.post('/isadmin/:groupName', groupCtrl.isAdmin)
 
-
 router.get('/groups', groupCtrl.getGroups)
 router.get('/groups/:groupId', groupCtrl.getGroup)
 router.get('/groupsname', groupCtrl.getGroupName)

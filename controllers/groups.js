@@ -19,7 +19,8 @@ const createGroup = async function (req, res) {
 
         group.visibility = req.body.visibility
         if ('private'.match(req.body.visibility)) group.password = req.body.password
-        group.admin = displayName
+        group.admin = id
+        group.adminName = displayName
         group.users = [id]
         group.avatar = group.gravatar()
 
@@ -248,12 +249,12 @@ const changeAdmin = (req, res) => {
     let userId = req.body.userId
     let newAdmin = req.body.newAdmin
 
-    let adminDisplayName = getDisplayName(res, userId)
-    Group.count({ name: groupName, admin: adminDisplayName }, function (err, count) {
+    Group.count({ name: groupName, admin: userId }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        console.log(count)
         if (count === 1) { // It means that userId is admin in the group
             let displayName = getDisplayName(res, newAdmin)
-            Group.update({ name: groupName }, { $set: { 'admin': displayName } }, { multi: false, upsert: false }, function (err, updated) {
+            Group.update({ name: groupName }, { $set: { 'admin': newAdmin, 'adminName': displayName } }, { multi: false, upsert: false }, function (err, updated) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
                 if (!updated) return res.status(404).send({ msg: `Error: admin not valid: ${err}` })
                 return res.status(200).send({ updated })
