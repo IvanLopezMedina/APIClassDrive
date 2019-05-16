@@ -254,21 +254,28 @@ const changeAdmin = (req, res) => {
     let userId = req.body.userId
     let newAdmin = req.body.newAdmin
 
-    Group.count({ name: groupName, admin: userId }, function (err, count) {
-        console.log(groupName + userId)
+    let adminDisplayName = getDisplayName(userId)
+    Group.count({ name: groupName, admin: adminDisplayName }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-        console.log(count)
         if (count === 1) { // It means that userId is admin in the group
-            User.find({ _id: newAdmin }, { displayname: 1 }, function (err, displayName) {
+            let displayName = getDisplayName(newAdmin)
+            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+            if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
+            Group.update({ name: groupName }, { $set:{ 'admin': displayName } }, { multi: false, upsert: false }, function (err, updated) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
-                Group.update({ name: groupName }, { $set:{ 'admin': displayName } }, { multi: false, upsert: false }, function (err, updated) {
-                    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                    if (!updated) return res.status(404).send({ msg: `Error: admin not valid: ${err}` })
-                    return res.status(200).send({ updated })
-                })
+                if (!updated) return res.status(404).send({ msg: `Error: admin not valid: ${err}` })
+                return res.status(200).send({ updated })
             })
+            
         } else return res.status(409).send({ message: `This user is not an admin: ${err}` })
+    })
+}
+
+function getDisplayName(userId) {
+    User.find({ _id: userId }, { displayname: 1 }, function (err, displayName) {
+        if (err) return `Error retrieving count data: ${err}`
+        if (!displayName) return `Error: user not found: ${err}`
+        return displayName
     })
 }
 
