@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-mongoose.set('useFindAndModify', false)   //Bug version of mongoose
 const app = require('./app')
 const config = require('./config')
 const socketIo = require('socket.io')
@@ -11,8 +10,7 @@ const http = require('http')
 const server = http.createServer(app);
 const io = socketIo(server)
 
-
-mongoose.connect(config.db, (err, res) => {
+mongoose.connect(config.db, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }, (err, res) => {
     if (err) {
         return console.log(`Error connecting to the database: ${err}`)
     }
