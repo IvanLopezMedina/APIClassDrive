@@ -3,7 +3,6 @@ const User = require('../models/user')
 const forumCtrl = require('./forums')
 const chatCtrl = require('./chat')
 const Search = require('../models/search')
-// const { check, validationResult } = require('express-validator');
 
 const createGroup = async function (req, res) {
     let valid = validGroup(req)
@@ -187,10 +186,10 @@ const unsubscribe = (req, res) => {
 const getGroups = (req, res) => {
     let userId = req.body.userId
     let moreInfo = req.body.moreInfo
-    let get = {_id:1, adminName:1, avatar:1, creationDate:1, name:1, users:1}
-    if (!moreInfo) {
-        get = { _id: 1, name: 1, tags: 1, avatar: 1 }
-    }
+    let get = { _id: 1, adminName: 1, avatar: 1, creationDate: 1, name: 1, users: 1 }
+
+    if (!moreInfo) get = { _id: 1, name: 1, tags: 1, avatar: 1 }
+
     Group.find({ users: { $in: userId } }, get, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
@@ -231,7 +230,6 @@ const changeAdmin = (req, res) => {
 
     Group.count({ name: groupName, admin: userId }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-        //console.log(count)
         if (count === 1) { // It means that userId is admin in the group
             User.find({ _id: newAdmin }, { _id: 0, displayname: 1 }, function (err, displayName) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
