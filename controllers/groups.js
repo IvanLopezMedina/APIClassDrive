@@ -253,7 +253,7 @@ const changeAdmin = (req, res) => {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
         //console.log(count)
         if (count === 1) { // It means that userId is admin in the group
-            User.find({ _id: userId }, { _id: 0, displayname: 1 }, function (err, displayName) {
+            User.find({ _id: newAdmin }, { _id: 0, displayname: 1 }, function (err, displayName) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
                 if (!displayName) return res.status(404).send({ msg: `Error: user not found: ${err}` })
                 Group.count({ name: groupName, users: { $in: [ newAdmin ] } }, function (err, ingroup) {
