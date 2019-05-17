@@ -5,7 +5,6 @@ const socketIo = require('socket.io')
 
 app.set('port', process.env.PORT || config.port)
 
-//config of Server Socket
 const http = require('http')
 const server = http.createServer(app);
 const io = socketIo(server)
@@ -29,7 +28,7 @@ io.on('connection', socket => {
     })
     socket.on('message', (message, groupname) => {
         socket.to(groupname).broadcast.emit('message', message)
-    }) 
+    })
     socket.on('typing', (displayname, groupname) => {
         socket.to(groupname).broadcast.emit('typing', {
             message: displayname + ' está escribiendo'
