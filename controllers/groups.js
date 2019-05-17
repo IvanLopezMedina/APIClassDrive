@@ -41,9 +41,7 @@ const createGroup = async function (req, res) {
                 for (let i = 0; i < req.body.tags.length; i++) {
                     await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
                         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                        if (count === 0) { // new tag
-                            arrayTags.push({ name: req.body.tags[i].toLowerCase(), type: 'tags', nSearches: 0 })
-                        }
+                        if (count === 0) arrayTags.push({ name: req.body.tags[i].toLowerCase(), type: 'tags', nSearches: 0 })
                     })
                 }
                 if (arrayTags.length !== 0) {
@@ -51,13 +49,10 @@ const createGroup = async function (req, res) {
                         if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
                     })
                 }
-
                 return res.status(200).send({ group: group })
             })
         } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
-    } else {
-        return res.status(500).send({ message: valid[0] })
-    }
+    } else return res.status(500).send({ message: valid[0] })
 }
 
 const getGroup = (req, res) => {
