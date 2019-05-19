@@ -3,7 +3,6 @@ const User = require('../models/user')
 const forumCtrl = require('./forums')
 const chatCtrl = require('./chat')
 const Search = require('../models/search')
-// const { check, validationResult } = require('express-validator');
 
 const createGroup = async function (req, res) {
     let valid = validGroup(req)
@@ -14,65 +13,45 @@ const createGroup = async function (req, res) {
         let displayName = req.body.user
         let id = req.body.id
         let groupName = req.body.name
+
         group.name = groupName
         group.tags = req.body.tags
-
         group.visibility = req.body.visibility
-        if ('private'.match(req.body.visibility)) group.password = req.body.password
         group.admin = id
         group.adminName = displayName
         group.users = [id]
         group.avatar = group.gravatar()
+        if ('private'.match(req.body.visibility)) group.password = req.body.password
 
         if (group.validatePassword() || 'public'.match(req.body.visibility)) {
-            // Add Group to Collection Groups
             group.save(async function (err) {
                 if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                else {
-                    // Add Group to Collection Forum
-                    let val = forumCtrl.createForum(req.body.name)
-                    if (!val[2]) {
-                        return res.status(val[1]).send({ msg: val[0] })
-                    }
+                let val = forumCtrl.createForum(req.body.name)
+                if (!val[2]) return res.status(val[1]).send({ msg: val[0] })
 
-                    // Add Group to Collection Chat
-                    val = chatCtrl.createChat(req.body.name)
-                    if (!val[2]) {
-                        return res.status(val[1]).send({ msg: val[0] })
-                    }
+                val = chatCtrl.createChat(req.body.name)
+                if (!val[2]) return res.status(val[1]).send({ msg: val[0] })
 
-                    // Add values to Collection Search
-                    await Search.countDocuments({ name: req.body.name }, function (err, count) {
+                await Search.create({ name: groupName.toLowerCase(), type: 'name', nSearches: 0 }, function (err, inserted) {
+                    if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+                    if (!inserted) console.log('Search already added to the set')
+                })
+
+                for (let i = 0; i < req.body.tags.length; i++) {
+                    await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
                         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                        if (count === 0) { // new name
-                            search.name = req.body.name.toLowerCase()
-                            search.type = 'name'
-                            search.nSearches = 0
-                            search.save((err) => {
-                                if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                            })
-                        }
+                        if (count === 0) arrayTags.push({ name: req.body.tags[i].toLowerCase(), type: 'tags', nSearches: 0 })
                     })
-                    for (let i = 0; i < req.body.tags.length; i++) {
-                        await Search.countDocuments({ name: req.body.tags[i] }, function (err, count) {
-                            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-                            if (count === 0) { // new tag
-                                arrayTags.push({ name: req.body.tags[i].toLowerCase(), type: 'tags', nSearches: 0 })
-                            }
-                        })
-                    }
-                    if (arrayTags.length !== 0) {
-                        search.collection.insertMany(arrayTags, function (err) {
-                            if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
-                        })
-                    }
+                }
+                if (arrayTags.length !== 0) {
+                    search.collection.insertMany(arrayTags, function (err) {
+                        if (err) return res.status(409).send({ msg: `Error creating the group: ${err}` })
+                    })
                 }
                 return res.status(200).send({ group: group })
             })
         } else return res.status(403).send({ msg: `Error creating the group, invalid data:` })
-    } else {
-        return res.status(500).send({ message: valid[0] })
-    }
+    } else return res.status(500).send({ message: valid[0] })
 }
 
 const getGroup = (req, res) => {
@@ -207,10 +186,10 @@ const unsubscribe = (req, res) => {
 const getGroups = (req, res) => {
     let userId = req.body.userId
     let moreInfo = req.body.moreInfo
-    let get = {_id:1, adminName:1, avatar:1, creationDate:1, name:1, users:1}
-    if (!moreInfo) {
-        get = { _id: 1, name: 1, tags: 1, avatar: 1 }
-    }
+    let get = { _id: 1, adminName: 1, avatar: 1, creationDate: 1, name: 1, users: 1 }
+
+    if (!moreInfo) get = { _id: 1, name: 1, tags: 1, avatar: 1 }
+
     Group.find({ users: { $in: userId } }, get, function (err, infogroup) {
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
         if (!infogroup) return res.status(404).send({ message: `Group doesnt exist: ${err}` })
@@ -251,7 +230,6 @@ const changeAdmin = (req, res) => {
 
     Group.count({ name: groupName, admin: userId }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
-        //console.log(count)
         if (count === 1) { // It means that userId is admin in the group
             User.find({ _id: newAdmin }, { _id: 0, displayname: 1 }, function (err, displayName) {
                 if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })

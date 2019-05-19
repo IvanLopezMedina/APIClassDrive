@@ -1,18 +1,15 @@
 const mongoose = require('mongoose')
-mongoose.set('useFindAndModify', false)   //Bug version of mongoose
 const app = require('./app')
 const config = require('./config')
 const socketIo = require('socket.io')
 
 app.set('port', process.env.PORT || config.port)
 
-//config of Server Socket
 const http = require('http')
 const server = http.createServer(app);
 const io = socketIo(server)
 
-
-mongoose.connect(config.db, (err, res) => {
+mongoose.connect(config.db, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }, (err, res) => {
     if (err) {
         return console.log(`Error connecting to the database: ${err}`)
     }
@@ -31,7 +28,7 @@ io.on('connection', socket => {
     })
     socket.on('message', (message, groupname) => {
         socket.to(groupname).broadcast.emit('message', message)
-    }) 
+    })
     socket.on('typing', (displayname, groupname) => {
         socket.to(groupname).broadcast.emit('typing', {
             message: displayname + ' está escribiendo'

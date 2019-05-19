@@ -4,7 +4,8 @@ const Schema = mongoose.Schema
 const SearchSchema = Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     type: {
         type: String,
