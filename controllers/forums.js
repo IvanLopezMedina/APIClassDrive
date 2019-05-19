@@ -19,8 +19,8 @@ const addPost = (req, cb) => {
     if (valid[1]) {
         let groupName = req.params.groupName
         Forum.Forum.findOne({ groupName: groupName }, (err, forum) => {
-            if (err) cb(new Error([`Error retrieving data: ${err}`, false]))
-            if (!forum) cb(new Error([`Forum doesn't exist`, false]))
+            if (err) cb(new Array(`Error retrieving data: ${err}`, false))
+            if (!forum) cb(new Array(`Forum doesn't exist`, false))
             else {
                 let post = new Forum.Post()
                 post.content = req.body.content
@@ -30,13 +30,13 @@ const addPost = (req, cb) => {
                 post.dislikes = req.body.dislikes
                 forum.posts.push(post)
                 forum.save((err) => {
-                    if (err) cb(new Error([`Error creating post: ${err}`, false]))
-                    cb(new Array(['', true]))
+                    if (err) cb(new Array(`Error creating post: ${err}`, false))
+                    cb(new Array('', true))
                 })
             }
         })
     } else {
-        cb(new Array([valid[0], false]))
+        cb(new Array(valid[0], false))
     }
 }
 
@@ -52,12 +52,12 @@ const addAnswer = (req, cb) => {
     if (!req.body.postId) query = { groupName: req.params.groupName, 'posts.author': req.body.replies[0].author, 'posts.date': req.body.replies[0].date, 'posts.content': req.body.replies[0].reply }
     else query = { groupName: req.params.groupName, 'posts._id': req.body.postId }
     Forum.Forum.findOneAndUpdate(query, { $push: { 'posts.$.answers': answer } }, (err, forum) => {
-        if (err) cb(new Error([`Error retrieving data: ${err}`, false]))
-        if (forum) cb(new Error(['Answer added correctly', true]))
+        if (err) cb(new Array(`Error retrieving data: ${err}`, false))
+        if (forum) cb(new Array('Answer added correctly', true))
     })
 }
 
-const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forumen vez de Chat (ruta sigue siendo la misma)
+const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forum en vez de Chat (ruta sigue siendo la misma)
     addPost(req, function (correctAdded) {
         if (!correctAdded[1]) {
             return res.status(404).send({ message: correctAdded[0] })
