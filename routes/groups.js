@@ -17,7 +17,7 @@ router.get('/getusers', groupCtrl.getUsers)
 router.delete('/groups/:groupId', groupCtrl.deleteGroup)
 
 router.put('/subscribe', groupCtrl.subscribe)
-router.put('/unsubscribe/:groupId', groupCtrl.unsubscribe)
+router.put('/unsubscribe', groupCtrl.unsubscribe)
 router.put('/changeadmin', groupCtrl.changeAdmin)
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
