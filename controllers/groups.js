@@ -198,17 +198,18 @@ const getGroups = (req, res) => {
 }
 
 function getUsers (req, res) {
-    let groupId = req.params.groupId
-
-    Group.findById(groupId, (err, group) => {
+    let groupname = req.body.groupName
+    Group.find({ name: groupname }, (err, group) => {
         if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ msg: `Group doesnt exist: ${err}` })
-
-        if (group.users == null || group.users === '' || group.users.length === 0) {
+        if (group[0].users == null || group[0].users === '' || group[0].users.length === 0) {
             return res.status(404).send({ msg: `Error: users is empty: ${err}` })
-        } else {
-            return res.status(200).send(group.users)
         }
+        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, (err, userData) => {
+            if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
+            if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
+            return res.status(200).send(userData)
+        })
     })
 }
 
