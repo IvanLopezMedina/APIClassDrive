@@ -177,7 +177,7 @@ const unsubscribe = (req, res) => {
     let userId = req.body.userId
     let unsubscribedId = req.body.unsubscribedId
 
-    Group.count({ name: groupName, admin: userId }, function (err, count) {
+    Group.countDocuments({ name: groupName, admin: userId }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
         if (count === 1) { // It means that userId is admin in the group
             Group.updateOne({ name: groupName }, { $pull: { 'users': unsubscribedId } }, function (err, updated) {
@@ -209,8 +209,8 @@ const getGroups = (req, res) => {
     })
 }
 
-function getUsers (req, res) {
-    let groupname = req.body.groupName
+const getUsers = function (req, res) {
+    let groupname = req.params.groupName
     Group.find({ name: groupname }, (err, group) => {
         if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ msg: `Group doesnt exist: ${err}` })
