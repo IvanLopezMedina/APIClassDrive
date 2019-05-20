@@ -173,13 +173,25 @@ const subscribe = (req, res) => {
 }
 
 const unsubscribe = (req, res) => {
-    let groupId = req.params.groupId
+    let groupName = req.body.groupName
     let userId = req.body.userId
+    let unsubscribedId = req.body.unsubscribedId
 
-    Group.updateOne({ _id: groupId }, { $pull: { 'users': userId } }, function (err, updated) {
-        if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-        if (updated.nModified === 0) return res.status(404).send({ message: `User not in the group` })
-        return res.status(200).send({ message: `User eliminated` })
+    Group.countDocuments({ name: groupName, admin: userId }, function (err, count) {
+        if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
+        if (count === 1) { // It means that userId is admin in the group
+            Group.updateOne({ name: groupName }, { $pull: { 'users': unsubscribedId } }, function (err, updated) {
+                if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+                if (updated.nModified === 0) return res.status(404).send({ message: `User not in the group` })
+                return res.status(200).send({ message: `User eliminated` })
+            })
+        } else {
+            Group.updateOne({ name: groupName }, { $pull: { 'users': userId } }, function (err, updated) {
+                if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
+                if (updated.nModified === 0) return res.status(404).send({ message: `User not in the group` })
+                return res.status(200).send({ message: `User eliminated` })
+            })
+        }
     })
 }
 
@@ -197,18 +209,19 @@ const getGroups = (req, res) => {
     })
 }
 
-function getUsers (req, res) {
-    let groupId = req.params.groupId
-
-    Group.findById(groupId, (err, group) => {
+const getUsers = function (req, res) {
+    let groupname = req.params.groupName
+    Group.find({ name: groupname }, (err, group) => {
         if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
         if (!group) return res.status(404).send({ msg: `Group doesnt exist: ${err}` })
-
-        if (group.users == null || group.users === '' || group.users.length === 0) {
+        if (group[0].users == null || group[0].users === '' || group[0].users.length === 0) {
             return res.status(404).send({ msg: `Error: users is empty: ${err}` })
-        } else {
-            return res.status(200).send(group.users)
         }
+        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, (err, userData) => {
+            if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
+            if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
+            return res.status(200).send(userData)
+        })
     })
 }
 
