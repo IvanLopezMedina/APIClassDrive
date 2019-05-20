@@ -10,6 +10,7 @@ const addTest = (req, res) => {
     question.answer = req.body.answer
     question.correctAnswer = req.body.correctAnswer
 
+    if (test.name == null || question.question == null) return res.status(404).send({ msg: 'Question and name are required' })
     test.questions.push(question)
 
     test.save(err => {
@@ -24,7 +25,7 @@ const addTest = (req, res) => {
 const getAllTest = (req, res) => {
     Test.Test.find({ groupName: req.params.groupName }, { _id: 1, user: 1, creationDate: 1, name: 1 }, (err, test) => { // Añadir la cuenta de preguntas que tiene con la proyeccion (Cris en clase de Mongo)
         if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
-        if (!test) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
+        if (!test || test.length === 0) return res.status(404).send({ message: `The test doesn't exist: ${err}` })
         res.status(200).send(test)
     })
 }

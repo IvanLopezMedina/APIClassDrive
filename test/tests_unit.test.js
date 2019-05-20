@@ -22,7 +22,8 @@ mongoose.connect(config.db, (err, res) => {
 
 describe('API Tests', function () {
     var test = { name: 'Test1', user: 'cris', groupName: 'Cristina', question: 'ola k ase?', answer: 'answer', correctAnswer: 'answer' }
-    var test2 = { name: 'Test1', user: 'cris', groupName: 'Cristina' }
+    var testNoQuestion = { name: 'Test1', user: 'cris', groupName: 'Cristina' }
+    var testNoName = { user: 'cris', groupName: 'Cristina', question: 'ola k ase?', answer: 'answer', correctAnswer: 'answer' }
     describe('## Function addTest', function () {
         it('should add test', function () {
             request(app).post('/api/tests/addtest').send(test).end(function (err, res) {
@@ -34,9 +35,81 @@ describe('API Tests', function () {
 
     describe('## Function addTest', function () {
         it('should return error: question is required', function () {
-            request(app).post('/api/tests/addtest').send(test2).end(function (err, res) {
+            request(app).post('/api/tests/addtest').send(testNoQuestion).end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(409)
                 assert.strictEqual(res.statusCode, 409)
+            })
+        })
+    })
+
+    describe('## Function addTest', function () {
+        it('should return error: name is required', function () {
+            request(app).post('/api/tests/addtest').send(testNoName).end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 404)
+            })
+        })
+    })
+
+    describe('## Function getAllTest', function () {
+        it('should return all tests of a group', function () {
+            request(app).get('/api/tests/alltests/Cristina').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 200)
+            })
+        })
+    })
+
+    describe('## Function getAllTest', function () {
+        it('should return error: groupName is required', function () {
+            request(app).get('/api/tests/alltests').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 404)
+            })
+        })
+    })
+
+    describe('## Function getAllTest', function () {
+        it('should return error: group does not exist', function () {
+            request(app).get('/api/tests/alltests/hmnbnm').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(404)
+                assert.strictEqual(res.statusCode, 404)
+            })
+        })
+    })
+
+    describe('## Function getTest', function () {
+        it('should return a test', function () {
+            request(app).get('/api/tests/test/5cdd570c81f6d433b07ec92d').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 200)
+            })
+        })
+    })
+
+    describe('## Function getTest', function () {
+        it('should return error: testId is required', function () {
+            request(app).get('/api/tests/test').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 404)
+            })
+        })
+    })
+
+    describe('## Function getTest', function () {
+        it('should return error: testId is required', function () {
+            request(app).get('/api/tests/test').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 404)
+            })
+        })
+    })
+
+    describe('## Function getTest', function () {
+        it('should return error: test does not exist', function () {
+            request(app).get('/api/tests/test/5cdd570c81f6d433b07ec911').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(409)
+                assert.strictEqual(res.statusCode, 404)
             })
         })
     })
