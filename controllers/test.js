@@ -5,6 +5,7 @@ const addTest = (req, res) => {
     let question = new Test.Questions()
     test.name = req.body.name
     test.user = req.body.user
+    test.creationDate = Date.now()
     test.groupName = req.body.groupName
     question.question = req.body.question
     question.answer = req.body.answer
