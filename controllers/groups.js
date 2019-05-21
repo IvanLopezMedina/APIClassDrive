@@ -3,6 +3,7 @@ const User = require('../models/user')
 const forumCtrl = require('./forums')
 const chatCtrl = require('./chat')
 const Search = require('../models/search')
+const fs = require('fs')
 
 const createGroup = async function (req, res) {
     let valid = validGroup(req)
@@ -217,10 +218,41 @@ const getUsers = function (req, res) {
         if (group[0].users == null || group[0].users === '' || group[0].users.length === 0) {
             return res.status(404).send({ msg: `Error: users is empty: ${err}` })
         }
-        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, (err, userData) => {
+        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, { sort: {displayname : 1}},  (err, userData) => {
             if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
             if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
-            return res.status(200).send(userData)
+            let itemsProcessed = 0
+            let usersDataUpdated = []
+            let completed = new Promise((resolve, reject) => {
+                userData.forEach((value, index, array) => {
+                        new Promise((resolve, reject) => {
+                        let avatar = value.avatar
+                        let avatarSplitted = avatar.split("//")
+                        if(avatarSplitted[0] === "https:") {
+                            let valueUpdated = value.toObject()
+                            valueUpdated.type = "avt"
+                            resolve(valueUpdated)
+                        }
+                        else {
+                            fs.readFile('./profiles/' + value.avatar, 'base64', (err, base64Image) => {
+                                let valueUpdated = value.toObject()
+                                valueUpdated.avatar = `data:image/jpeg;base64, ${base64Image}`
+                                valueUpdated.type = "img"
+                                resolve(valueUpdated)
+                            })
+                        }
+                    }).then(result => {
+                        itemsProcessed++
+                        usersDataUpdated.push(result)
+                        if(itemsProcessed === array.length) {
+                            resolve(usersDataUpdated)
+                        }
+                    })
+                })           
+            })
+            completed.then(result => {
+                return res.status(200).send(result)
+            }) 
         })
     })
 }
