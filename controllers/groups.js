@@ -218,7 +218,7 @@ const getUsers = function (req, res) {
         if (group[0].users == null || group[0].users === '' || group[0].users.length === 0) {
             return res.status(404).send({ msg: `Error: users is empty: ${err}` })
         }
-        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, { sort: {displayname : 1}},  (err, userData) => {
+        User.find({ '_id': { $in: group[0].users } }, { displayname: 1, avatar: 1 }, (err, userData) => {
             if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
             if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
             let itemsProcessed = 0
@@ -251,6 +251,11 @@ const getUsers = function (req, res) {
                 })           
             })
             completed.then(result => {
+                result.sort(function(a, b){
+                    if(a.displayname < b.displayname) { return -1; }
+                    if(a.displayname > b.displayname) { return 1; }
+                    return 0;
+                })
                 return res.status(200).send(result)
             }) 
         })
