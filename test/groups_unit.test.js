@@ -163,7 +163,7 @@ describe('API Tests', function () {
     describe('## Function getGroupName ', function () {
         it('should send and error because doesnt exist a group with that name', function () {
             request(app).get('/api/groupsname').send(nameinvented).end(function (err, res) {
-                if (err) expect(res.statusCode).to.equal(200)
+                if (err) expecta d'enviar(res.statusCode).to.equal(200)
                 assert.strictEqual(res.statusCode, 404)
             })
         })
@@ -227,19 +227,6 @@ describe('API Tests', function () {
                 assert.strictEqual(200, res.statusCode)
                 done()
             })
-        })
-    })
-    describe('###### Function GetGroups Bucle', function () {
-        it('shouls send get groups one hundred times', function () {
-            let cont = 0
-            while (cont < 5) {
-                cont++
-                console.log(cont)
-                request(app).put('/api/getgroups').end(function (err, res) {
-                    if (err) assert.strictEqual(404, res.statusCode)
-                    assert.strictEqual(200, res.statusCode)
-                })
-            }
         })
     })
 })

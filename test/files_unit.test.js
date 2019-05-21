@@ -23,7 +23,7 @@ mongoose.connect(config.db, (err, res) => {
 describe('API Tests', function () {
     describe('## Function getFiles', function () {
         it('should get all the files', function () {
-            request(app).get('/api/getfiles/groupname').end(function (err, res) {
+            request(app).get('/api/getfiles/lis').end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(404)
                 assert.strictEqual(res.statusCode, 200)
             })
@@ -47,7 +47,7 @@ describe('API Tests', function () {
     })
     describe('## Function getFile', function () {
         it('should get an error because the id doesnt exist', function () {
-            request(app).get('/api/getfile/5cb848ef2e').end(function (err, res) {
+            request(app).get('/api/getfile/noexisteix').end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(200)
                 assert.strictEqual(res.statusCode, 404)
             })
@@ -55,7 +55,7 @@ describe('API Tests', function () {
     })
     describe('## Function addFile', function () {
         it('should add a file', function () {
-            request(app).post('/api/addFile/groupname').end(function (err, res) {
+            request(app).post('/api/addFile/lis').end(function (err, res) {
                 if (err) expect(res.statusCode).to.equal(404)
                 assert.strictEqual(res.statusCode, 200)
             })
@@ -63,9 +63,9 @@ describe('API Tests', function () {
     })
     describe('## Function deleteFile', function () {
         it('should delete a file', function () {
-            request(app).put('/api/deleteFile/groupname').end(function (err, res) {
-                if (err) expect(res.statusCode).to.equal(200)
-                assert.strictEqual(res.statusCode, 404)
+            request(app).put('/api/deleteFile/lis').end(function (err, res) {
+                if (err) expect(res.statusCode).to.equal(404)
+                assert.strictEqual(res.statusCode, 200)
             })
         })
     })
