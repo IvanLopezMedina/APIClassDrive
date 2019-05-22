@@ -41,6 +41,7 @@ const addFile = (req, res) => {
             file.name = fields.name
             file.userId = fields.userId
             file.type = extension
+            file.uploadDate = Date.now()
             file.groupName = req.params.groupName
             file.path = 'files/' + req.params.groupName.toString() + '/' + file.name
             file.user = fields.user

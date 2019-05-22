@@ -27,9 +27,8 @@ const TestSchema = new Schema({
         required: true
     },
     creationDate: {
-        type: Date,
-        default: Date.now()
-    },
+        type: Date
+    }
 },
 {
     versionKey: false

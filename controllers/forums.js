@@ -59,7 +59,7 @@ const addAnswer = (req, cb) => {
     })
 }
 
-const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forumen vez de Chat (ruta sigue siendo la misma)
+const addPostResp = (req, res) => { // Funcion para añadir preguntas a traves de Forum en vez de Chat (ruta sigue siendo la misma)
     addPost(req, function (correctAdded) {
         if (!correctAdded[1]) {
             return res.status(404).send({ message: correctAdded[0] })
