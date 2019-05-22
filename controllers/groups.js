@@ -181,7 +181,6 @@ const unsubscribe = (req, res) => {
     Group.countDocuments({ name: groupName, admin: userId }, function (err, count) {
         if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
         if (count === 1) { // It means that userId is admin in the group
-            if (userId === unsubscribedId) return res.status(409).send({ message: `You are the admin, you cannot unsubscribe in that role:` })
             Group.updateOne({ name: groupName }, { $pull: { 'users': unsubscribedId } }, function (err, updated) {
                 if (err) return res.status(409).send({ message: `Error retrieving data: ${err}` })
                 if (updated.nModified === 0) return res.status(404).send({ message: `User not in the group` })
