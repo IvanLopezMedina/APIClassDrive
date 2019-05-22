@@ -92,50 +92,49 @@ const getPosts = (req, res) => {
         let usersDataUpdated = []
         let itemsProcessed = 0
         let completed = new Promise((resolve, reject) => {
-        forum.posts.forEach((value, index, array) => {
-            new Promise((resolve, reject) => {
-                User.find({displayname: value.author}, {_id:0, avatar:1}, (err, userData) => {
-                    if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
-                    if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
-                    new Promise((resolve, reject) => {
-                        let avatar = userData[0].avatar
-                        let avatarSplitted = avatar.split("//")
-                        if(avatarSplitted[0] === "https:") {
-                            let valueUpdated = userData[0].toObject()
-                            valueUpdated.type = "avt"
-                            resolve(valueUpdated)
-                        }
-                        else {
-                            fs.readFile('./profiles/' + userData[0].avatar, 'base64', (err, base64Image) => {
+            forum.posts.forEach((value, index, array) => {
+                new Promise((resolve, reject) => {
+                    User.find({ displayname: value.author }, { _id: 0, avatar: 1 }, (err, userData) => {
+                        if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
+                        if (!userData) return res.status(404).send({ msg: `No users: ${err}` })
+                        new Promise((resolve, reject) => {
+                            let avatar = userData[0].avatar
+                            let avatarSplitted = avatar.split('//')
+                            if (avatarSplitted[0] === 'https:') {
                                 let valueUpdated = userData[0].toObject()
-                                valueUpdated.avatar = `data:image/jpeg;base64, ${base64Image}`
-                                valueUpdated.type = "img"
+                                valueUpdated.type = 'avt'
                                 resolve(valueUpdated)
-                            })
-                        }
-                    }).then(result => {
-                        resolve(result)
+                            } else {
+                                fs.readFile('./profiles/' + userData[0].avatar, 'base64', (err, base64Image) => {
+                                    if (err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
+                                    let valueUpdated = userData[0].toObject()
+                                    valueUpdated.avatar = `data:image/jpeg;base64, ${base64Image}`
+                                    valueUpdated.type = 'img'
+                                    resolve(valueUpdated)
+                                })
+                            }
+                        }).then(result => {
+                            resolve(result)
+                        })
                     })
-                })
                 }).then(result => {
                     itemsProcessed++
                     let valueUpdated = value.toObject()
                     valueUpdated.type = result.type
                     valueUpdated.avatar = result.avatar
                     usersDataUpdated.push(valueUpdated)
-                    if(itemsProcessed === array.length) {
+                    if (itemsProcessed === array.length) {
                         resolve(usersDataUpdated)
                     }
                 })
             })
         })
-        completed.then( result => {
-            
+        completed.then(result => {
             result.sort((left, right) => {
                 return moment.utc(left.date, 'MMMM Do YYYY, h:mm:ss a').diff(moment.utc(right.date , 'MMMM Do YYYY, h:mm:ss a'))
             })
             return res.status(200).send(result)
-        })  
+        })
     })
 }
 
