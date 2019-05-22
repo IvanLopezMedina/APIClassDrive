@@ -107,6 +107,7 @@ const getPosts = (req, res) => {
                         }
                         else {
                             fs.readFile('./profiles/' + userData[0].avatar, 'base64', (err, base64Image) => {
+                                if(err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
                                 let valueUpdated = userData[0].toObject()
                                 valueUpdated.avatar = `data:image/jpeg;base64, ${base64Image}`
                                 valueUpdated.type = "img"
@@ -168,6 +169,7 @@ const getPost = (req, res) => {
                                 }
                                 else {
                                     fs.readFile('./profiles/' + userData[0].avatar, 'base64', (err, base64Image) => {
+                                        if(err) return res.status(409).send({ msg: `Error retrieving data: ${err}` })
                                         let valueUpdated = userData[0].toObject()
                                         valueUpdated.avatar = `data:image/jpeg;base64, ${base64Image}`
                                         valueUpdated.type = "img"
