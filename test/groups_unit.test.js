@@ -25,7 +25,7 @@ describe('API Tests', function () {
     var namegroup = 'fsaaa'
     var search = ' hola'
     var bodyincorrect = { groupId: '8b2116', userId: '5ca241' }
-    var subscribe = { groupId: '5c98b2116c3e6d3eac21142d', userId: '5cdd480f3a8345585817b7e7', name: 'polla' }
+    var subscribe = { groupId: '5ce28906fa78443fd4f5f343', userId: '5cdd480f3a8345585817b7e7', name: 'aloha' }
     var userId = '5ca2432f8414b839dc090e63'
     var usereliminate = '5cc04781247a55910c601e99'
     var groupPublic = { name: 'lis', center: 'uab', tags: 'informàtica', visibility: 'public' }

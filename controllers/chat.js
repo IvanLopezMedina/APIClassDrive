@@ -71,7 +71,7 @@ const addMessage = (req, res) => {
 }
 
 const getMessages = (req, res) => {
-    Chat.Chat.find({ groupName: req.params.groupName }, { _id: 0, 'messages.date': 1, 'messages.author': 1, 'messages.content':1, 'messages.likes': 1, 'messages.dislikes': 1, 'messages.type': 1, 'messages._id': 1, 'messages.replies': 1 }, { limit: 50 }, (err, messages) => {
+    Chat.Chat.find({ groupName: req.params.groupName }, { _id: 0, 'messages.date': 1, 'messages.author': 1, 'messages.content': 1, 'messages.likes': 1, 'messages.dislikes': 1, 'messages.type': 1, 'messages._id': 1, 'messages.replies': 1 }, { limit: 50 }, (err, messages) => {
         if (err) return res.status(500).send({ message: `Error retrieving data: ${err}` })
         if (!messages) return res.status(404).send({ message: `Chat doesn't exist` })
         return res.status(200).send({ message: `Message received`, messages })
