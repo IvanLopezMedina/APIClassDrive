@@ -325,4 +325,3 @@ module.exports = {
     isAdmin,
     changeAdmin
 }
-

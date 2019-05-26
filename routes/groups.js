@@ -12,12 +12,13 @@ router.post('/isadmin/:groupName', groupCtrl.isAdmin)
 router.get('/groups', groupCtrl.getGroups)
 router.get('/groups/:groupId', groupCtrl.getGroup)
 router.get('/groupsname', groupCtrl.getGroupName)
-router.get('/groupusers/:groupId', groupCtrl.getUsers)
+router.get('/getusers/:groupName', groupCtrl.getUsers)
 
 router.delete('/groups/:groupId', groupCtrl.deleteGroup)
 
 router.put('/subscribe', groupCtrl.subscribe)
-router.put('/unsubscribe/:groupId', groupCtrl.unsubscribe)
+router.put('/unsubscribe', groupCtrl.unsubscribe)
+router.put('/changeadmin', groupCtrl.changeAdmin)
 // Adding auth to the method, we ensure that the user has a valid token
 // The token is send in the request body, with the tag: Authorization
 router.get('/private', auth, function (req, res) {

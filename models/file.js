@@ -18,8 +18,7 @@ const FileSchema = new Schema({
         type: String
     },
     uploadDate: {
-        type: Date,
-        default: Date.now()
+        type: Date
     },
     user: {
         type: String,
