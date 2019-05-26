@@ -163,13 +163,12 @@ const subscribe = (req, res) => {
             }
         }
         if (valid) {
-            if (err) return res.status(409).send({ message: `Error retrieving count data: ${err}` })
             Group.updateOne({ _id: groupId, users: { $ne: userId } }, { $push: { users: userId } }, (err, result) => {
                 if (err) return res.status(409).send({ message: `Error updating groups: ${err}` })
                 if (result.nModified === 0) return res.status(409).send({ message: `Group already added` })
                 res.status(200).send({ msg: 'Correct Subscribed' })
             })
-        } else res.status(409).send({ msg: `Invalid Password` })
+        }
     })
 }
 
