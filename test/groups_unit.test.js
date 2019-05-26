@@ -25,7 +25,7 @@ describe('API Tests', function () {
     var namegroup = 'fsaaa'
     var search = ' hola'
     var bodyincorrect = { groupId: '8b2116', userId: '5ca241' }
-    var subscribe = { groupId: '5c98b2116c3e6d3eac21142d', userId: '5cc04781247a55910c601e99', name: 'polla' }
+    var subscribe = { groupId: '5ce28906fa78443fd4f5f343', userId: '5cdd480f3a8345585817b7e7', name: 'aloha' }
     var userId = '5ca2432f8414b839dc090e63'
     var usereliminate = '5cc04781247a55910c601e99'
     var groupPublic = { name: 'lis', center: 'uab', tags: 'informàtica', visibility: 'public' }
@@ -163,7 +163,7 @@ describe('API Tests', function () {
     describe('## Function getGroupName ', function () {
         it('should send and error because doesnt exist a group with that name', function () {
             request(app).get('/api/groupsname').send(nameinvented).end(function (err, res) {
-                if (err) expect(res.statusCode).to.equal(200)
+                if (err) expect(es.statusCode).to.equal(200)
                 assert.strictEqual(res.statusCode, 404)
             })
         })
@@ -195,7 +195,7 @@ describe('API Tests', function () {
     })
     // No se perque falla perque el postman funciona
     describe('## Function Subscribe  ', function () {
-        it('should subscribe ', function (done) {
+        it('should subscribe ', function () {
             request(app).put('/api/subscribe').send(subscribe).end(function (err, res) {
                 if (err) assert.strictEqual(404, res.statusCode)
                 assert.strictEqual(200, res.statusCode)
