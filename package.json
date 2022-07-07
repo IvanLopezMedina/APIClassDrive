@@ -18,7 +18,7 @@
     "formidable": "1.2.1",
     "fs": "0.0.1-security",
     "jwt-simple": "0.5.5",
-    "moment": "2.24.0",
+    "moment": "2.29.4",
     "mongoose": "5.4.18",
     "socket.io": "2.2.0",
     "validator": "10.11.0"
